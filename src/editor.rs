@@ -165,7 +165,7 @@ impl Editor {
             _ => (),
         }
         width = if let Some(row) = self.buffer.row(y) {
-            row.len
+            row.len()
         } else {
             0
         };
