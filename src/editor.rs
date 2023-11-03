@@ -2,8 +2,13 @@ use crate::Buffer;
 use crate::Row;
 use crate::Terminal;
 use std::env;
+use std::time::Duration;
+use std::time::Instant;
+use termion::color;
 use termion::event::Key;
 
+const STATUS_FG_COLOR: color::Rgb = color::Rgb(63, 63, 63);
+const STATUS_BG_COLOR: color::Rgb = color::Rgb(239, 239, 239);
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const EDITOR_NAME: &str = "Sedrh";
 
@@ -13,20 +18,42 @@ pub struct Position {
     pub y: usize,
 }
 
+struct StatusMessage {
+    text: String,
+    time: Instant,
+}
+
+impl StatusMessage {
+    fn from(message: String) -> Self {
+        Self {
+            time: Instant::now(),
+            text: message,
+        }
+    }
+}
+
 pub struct Editor {
     should_quit: bool,
     terminal: Terminal,
     cursor_position: Position,
     offset: Position,
     buffer: Buffer,
+    status_message: StatusMessage,
 }
 
 impl Editor {
     pub fn default() -> Self {
         let args: Vec<String> = env::args().collect();
+        let mut initial_status = String::from("HELP: Ctrl-Q = quit");
         let buffer = if args.len() > 1 {
             let file_name = &args[1];
-            Buffer::open(&file_name).unwrap_or_default()
+            let buf = Buffer::open(&file_name);
+            if buf.is_ok() {
+                buf.unwrap()
+            } else {
+                initial_status = format!("ERR: Could not open file: {}", file_name);
+                Buffer::default()
+            }
         } else {
             Buffer::default()
         };
@@ -37,6 +64,7 @@ impl Editor {
             buffer,
             cursor_position: Position::default(),
             offset: Position::default(),
+            status_message: StatusMessage::from(initial_status),
         }
     }
 
@@ -64,6 +92,8 @@ impl Editor {
             println!("Goodbye!\r");
         } else {
             self.draw_rows();
+            self.draw_status_bar();
+            self.draw_message_bar();
             Terminal::cursor_position(&Position {
                 x: self.cursor_position.x.saturating_sub(self.offset.x),
                 y: self.cursor_position.y.saturating_sub(self.offset.y),
@@ -74,10 +104,57 @@ impl Editor {
         Terminal::flush()
     }
 
+    fn draw_status_bar(&self) {
+        let mut status;
+        let width = self.terminal.size().width as usize;
+        let mut file_name = "[No Name]".to_string();
+        if let Some(name) = &self.buffer.file_name {
+            file_name = name.clone();
+            file_name.truncate(20);
+        }
+        status = format!("{} - {} lines", file_name, self.buffer.len());
+
+        let line_indicator = format!(
+            "{}:{}",
+            self.cursor_position.y.saturating_add(1),
+            self.buffer.len()
+        );
+        let len = status.len() + line_indicator.len();
+        if width > status.len() {
+            status.push_str(&" ".repeat(width - status.len()));
+        }
+
+        status.truncate(width);
+        Terminal::set_bg_color(STATUS_FG_COLOR);
+        println!("{}\r", status);
+        Terminal::reset_bg_color();
+    }
+
+    fn draw_message_bar(&self) {
+        Terminal::clear_current_line();
+        let message = &self.status_message;
+        if Instant::now() - message.time < Duration::new(5, 0) {
+            let mut text = message.text.clone();
+            text.truncate(self.terminal.size().width as usize);
+            print!("{}", text);
+        }
+    }
+
     fn process_keypress(&mut self) -> Result<(), std::io::Error> {
         let pressed_key = Terminal::read_key()?;
         match pressed_key {
             Key::Ctrl('q') => self.should_quit = true,
+            Key::Char(c) => {
+                self.buffer.insert(&self.cursor_position, c);
+                self.move_cursor(Key::Right);
+            }
+            Key::Delete => self.buffer.delete(&self.cursor_position),
+            Key::Backspace => {
+                if self.cursor_position.x > 0 || self.cursor_position.y > 0 {
+                    self.move_cursor(Key::Left);
+                    self.buffer.delete(&self.cursor_position);
+                }
+            }
             Key::Up
             | Key::Down
             | Key::Left
@@ -127,7 +204,7 @@ impl Editor {
                 }
             }
             Key::Left => {
-                if x > 0{
+                if x > 0 {
                     x -= 1;
                 } else if y > 0 {
                     y -= 1;
@@ -137,11 +214,11 @@ impl Editor {
                         x = 0;
                     }
                 }
-            },
+            }
             Key::Right => {
                 if x < width {
                     x += 1;
-                } else if y <height {
+                } else if y < height {
                     y += 1;
                     x = 0;
                 }
@@ -152,14 +229,14 @@ impl Editor {
                 } else {
                     0
                 }
-            },
+            }
             Key::PageDown => {
                 y = if y.saturating_add(terminal_height) < height {
                     y + terminal_height as usize
                 } else {
                     height
                 }
-            },
+            }
             Key::Home => x = 0,
             Key::End => x = width,
             _ => (),
@@ -199,7 +276,7 @@ impl Editor {
 
     fn draw_rows(&self) {
         let height = self.terminal.size().height;
-        for terminal_row in 0..height - 1 {
+        for terminal_row in 0..height {
             Terminal::clear_current_line();
             if let Some(row) = self.buffer.row(terminal_row as usize + self.offset.y) {
                 self.draw_row(row);
