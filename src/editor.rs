@@ -47,7 +47,8 @@ pub struct Editor {
 impl Editor {
     pub fn default() -> Self {
         let args: Vec<String> = env::args().collect();
-        let mut initial_status = String::from("HELP: Ctrl-Q = quit | Ctrl-S = save");
+        let mut initial_status =
+            String::from("HELP: Ctrl-Q = quit | Ctrl-S = save | Ctrl-F = find");
         let buffer = if let Some(file_name) = args.get(1) {
             let buf = Buffer::open(file_name);
             if let Ok(buf) = buf {
@@ -211,6 +212,15 @@ impl Editor {
                 self.should_quit = true
             }
             Key::Ctrl('s') => self.save(),
+            Key::Ctrl('f') => {
+                if let Some(query) = self.prompt("Search: ").unwrap_or(None) {
+                    if let Some(position) = self.buffer.find(&query[..]) {
+                        self.cursor_position = position;
+                    } else {
+                        self.status_message = StatusMessage::from(format!("Not found :{}.", query));
+                    }
+                }
+            }
             Key::Char(c) => {
                 self.buffer.insert(&self.cursor_position, c);
                 self.move_cursor(Key::Right);
