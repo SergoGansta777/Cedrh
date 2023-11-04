@@ -205,15 +205,25 @@ impl Editor {
     fn search(&mut self) {
         let old_position = self.cursor_position.clone();
         if let Some(query) = self
-            .prompt("Search: ", |editor, _, query| {
-                if let Some(position) = editor.buffer.find(&query) {
+            .prompt("Search (ESC to cancel, Arrows to navigate): ", |editor, key, query| {
+                let mut moved = false;
+                match key {
+                    Key::Right | Key::Down => {
+                        editor.move_cursor(Key::Right);
+                        moved = true;
+                    }
+                    _ => (),
+                }
+                if let Some(position) = editor.buffer.find(&query, &editor.cursor_position) {
                     editor.cursor_position = position;
                     editor.scroll();
+                } else if moved {
+                    editor.move_cursor(Key::Left);
                 }
             })
             .unwrap_or(None)
         {
-            if let Some(position) = self.buffer.find(&query[..]) {
+            if let Some(position) = self.buffer.find(&query[..], &old_position) {
                 self.cursor_position = position;
             } else {
                 self.status_message = StatusMessage::from(format!("Not found :{}.", query));
