@@ -12,7 +12,7 @@ const STATUS_FG_COLOR: color::Rgb = color::Rgb(63, 63, 63);
 const STATUS_BG_COLOR: color::Rgb = color::Rgb(239, 239, 239);
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const EDITOR_NAME: &str = "Sedrh";
-const QUIT_TIMES: u8 = 2;
+const QUIT_TIMES: u8 = 1;
 
 #[derive(Default)]
 pub struct Position {
