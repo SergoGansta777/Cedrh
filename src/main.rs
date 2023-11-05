@@ -15,6 +15,7 @@ mod terminal;
 pub use buffer::Buffer;
 use editor::Editor;
 pub use editor::Position;
+pub use editor::SearchDirection;
 pub use row::Row;
 pub use terminal::Terminal;
 
