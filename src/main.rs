@@ -11,6 +11,7 @@ mod buffer;
 mod editor;
 mod row;
 mod terminal;
+mod highlighting;
 
 pub use buffer::Buffer;
 use editor::Editor;
