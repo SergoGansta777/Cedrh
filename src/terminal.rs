@@ -23,7 +23,7 @@ impl Terminal {
             size: Size {
                 width: size.0,
                 height: size.1.saturating_sub(2),
-            }, 
+            },
             _stdout: stdout().into_raw_mode()?,
         })
     }
@@ -38,12 +38,12 @@ impl Terminal {
 
     #[allow(clippy::cast_possible_truncation)]
     pub fn cursor_position(position: &Position) {
-        let Position{mut x, mut y} = position;
+        let Position { mut x, mut y } = position;
         x = x.saturating_add(1);
         y = y.saturating_add(1);
         let x = x as u16;
         let y = y as u16;
-        print!("{}", termion::cursor::Goto(x,y));
+        print!("{}", termion::cursor::Goto(x, y));
     }
 
     pub fn flush() -> Result<(), std::io::Error> {
