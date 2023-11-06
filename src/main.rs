@@ -9,14 +9,17 @@
 )]
 mod buffer;
 mod editor;
+mod filetype;
+mod highlighting;
 mod row;
 mod terminal;
-mod highlighting;
 
 pub use buffer::Buffer;
 use editor::Editor;
 pub use editor::Position;
 pub use editor::SearchDirection;
+pub use filetype::HighlightingOptions;
+pub use filetype::FileType;
 pub use row::Row;
 pub use terminal::Terminal;
 
