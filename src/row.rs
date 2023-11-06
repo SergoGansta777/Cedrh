@@ -196,10 +196,50 @@ impl Row {
         }
     }
 
+    fn highlight_str(
+        &mut self,
+        index: &mut usize,
+        substring: &str,
+        chars: &[char],
+        hl_type: highlighting::Type,
+    ) -> bool {
+        if substring.is_empty() {
+            return false;
+        }
+        for (substring_index, c) in substring.chars().enumerate() {
+            if let Some(next_char) = chars.get(index.saturating_add(substring_index)) {
+                if *next_char != c {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        }
+        for _ in 0..substring.len() {
+            self.highlighting.push(hl_type);
+            *index += 1;
+        }
+        true
+    }
+
+    fn highlight_primary_keywords(
+        &mut self,
+        index: &mut usize,
+        opts: &HighlightingOptions,
+        chars: &[char],
+    ) -> bool {
+        for word in opts.primary_keywords() {
+            if self.highlight_str(index, word, chars, highlighting::Type::PrimaryKeywords) {
+                return true;
+            }
+        }
+        false
+    }
+
     fn highlight_char(
         &mut self,
         index: &mut usize,
-        opts: HighlightingOptions,
+        opts: &HighlightingOptions,
         c: char,
         chars: &[char],
     ) -> bool {
@@ -227,7 +267,7 @@ impl Row {
     fn highlight_comment(
         &mut self,
         index: &mut usize,
-        opts: HighlightingOptions,
+        opts: &HighlightingOptions,
         c: char,
         chars: &[char],
     ) -> bool {
@@ -248,7 +288,7 @@ impl Row {
     fn highlight_string(
         &mut self,
         index: &mut usize,
-        opts: HighlightingOptions,
+        opts: &HighlightingOptions,
         c: char,
         chars: &[char],
     ) -> bool {
@@ -274,7 +314,7 @@ impl Row {
     fn highlight_number(
         &mut self,
         index: &mut usize,
-        opts: HighlightingOptions,
+        opts: &HighlightingOptions,
         c: char,
         chars: &[char],
     ) -> bool {
@@ -302,13 +342,14 @@ impl Row {
         false
     }
 
-    pub fn highlight(&mut self, opts: HighlightingOptions, word: Option<&str>) {
+    pub fn highlight(&mut self, opts: &HighlightingOptions, word: Option<&str>) {
         self.highlighting = Vec::new();
         let chars: Vec<char> = self.string.chars().collect();
         let mut index = 0;
         while let Some(c) = chars.get(index) {
             if self.highlight_char(&mut index, opts, *c, &chars)
                 || self.highlight_comment(&mut index, opts, *c, &chars)
+                || self.highlight_primary_keywords(&mut index, &opts, &chars)
                 || self.highlight_string(&mut index, opts, *c, &chars)
                 || self.highlight_number(&mut index, opts, *c, &chars)
             {

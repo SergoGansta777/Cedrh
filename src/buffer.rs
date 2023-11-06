@@ -21,7 +21,7 @@ impl Buffer {
         let mut rows = Vec::new();
         for value in contents.lines() {
             let mut row = Row::from(value);
-            row.highlight(file_type.highlighting_options(), None);
+            row.highlight(&file_type.highlighting_options(), None);
             rows.push(row);
         }
         Ok(Self {
@@ -59,8 +59,8 @@ impl Buffer {
         #[allow(clippy::indexing_slicing)]
         let current_row = &mut self.rows[at.y];
         let mut new_row = current_row.split(at.x);
-        current_row.highlight(self.file_type.highlighting_options(), None);
-        new_row.highlight(self.file_type.highlighting_options(), None);
+        current_row.highlight(&self.file_type.highlighting_options(), None);
+        new_row.highlight(&self.file_type.highlighting_options(), None);
         #[allow(clippy::integer_arithmetic)]
         self.rows.insert(at.y + 1, new_row);
     }
@@ -77,13 +77,13 @@ impl Buffer {
         if at.y == self.rows.len() {
             let mut row = Row::default();
             row.insert(0, c);
-            row.highlight(self.file_type.highlighting_options(), None);
+            row.highlight(&self.file_type.highlighting_options(), None);
             self.rows.push(row);
         } else {
             #[allow(clippy::indexing_slicing)]
             let row = &mut self.rows[at.y];
             row.insert(at.x, c);
-            row.highlight(self.file_type.highlighting_options(), None);
+            row.highlight(&self.file_type.highlighting_options(), None);
         }
     }
 
@@ -98,11 +98,11 @@ impl Buffer {
             let next_row = self.rows.remove(at.y + 1);
             let row = &mut self.rows[at.y];
             row.append(&next_row);
-            row.highlight(self.file_type.highlighting_options(), None);
+            row.highlight(&self.file_type.highlighting_options(), None);
         } else {
             let row = &mut self.rows[at.y];
             row.delete(at.x);
-            row.highlight(self.file_type.highlighting_options(), None);
+            row.highlight(&self.file_type.highlighting_options(), None);
         }
     }
 
@@ -113,7 +113,7 @@ impl Buffer {
             for row in &mut self.rows {
                 file.write_all(row.as_bytes())?;
                 file.write_all(b"\n")?;
-                row.highlight(self.file_type.highlighting_options(), None)
+                row.highlight(&self.file_type.highlighting_options(), None)
             }
             self.modificated = false;
         }
@@ -163,7 +163,7 @@ impl Buffer {
 
     pub fn highlight(&mut self, word: Option<&str>) {
         for row in &mut self.rows {
-            row.highlight(self.file_type.highlighting_options(), word);
+            row.highlight(&self.file_type.highlighting_options(), word);
         }
     }
 }
