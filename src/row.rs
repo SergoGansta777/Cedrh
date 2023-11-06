@@ -238,6 +238,17 @@ impl Row {
                 continue;
             }
 
+            if opts.comments() && *c == '/' {
+                if let Some(next_char) = chars.get(index.saturating_add(1)) {
+                    if *next_char == '/' {
+                        for _ in index..chars.len() {
+                            highlighting.push(highlighting::Type::Comment);
+                        }
+                        break;
+                    }
+                }
+            };
+
             if opts.strings() {
                 if in_string {
                     highlighting.push(highlighting::Type::String);
