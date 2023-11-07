@@ -134,7 +134,7 @@ impl Editor {
     fn draw_status_bar(&self) {
         let mut status;
         let width = self.terminal.size().width as usize;
-        let modifiend_indicator = if self.buffer.is_modificated() {
+        let modified_indicator = if self.buffer.is_modificated() {
             " (modified)"
         } else {
             ""
@@ -149,7 +149,7 @@ impl Editor {
             "{} - {} lines{}",
             file_name,
             self.buffer.len(),
-            modifiend_indicator
+            modified_indicator
         );
         let line_indicator = format!(
             "{} | {}/{}",
@@ -157,16 +157,17 @@ impl Editor {
             self.cursor_position.y.saturating_add(1),
             self.buffer.len()
         );
-        #[allow(clippy::arithmetic_side_effects)]
+        #[allow(clippy::integer_arithmetic)]
             let len = status.len() + line_indicator.len();
         status.push_str(&" ".repeat(width.saturating_sub(len)));
-
+        status = format!("{}{}", status, line_indicator);
         status.truncate(width);
-        Terminal::set_bg_color(STATUS_FG_COLOR);
-        println!("{status}\r");
+        Terminal::set_bg_color(STATUS_BG_COLOR);
+        Terminal::set_fg_color(STATUS_FG_COLOR);
+        println!("{}\r", status);
+        Terminal::reset_fg_color();
         Terminal::reset_bg_color();
     }
-
     fn draw_message_bar(&self) {
         Terminal::clear_current_line();
         let message = &self.status_message;
