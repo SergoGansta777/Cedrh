@@ -24,40 +24,49 @@ impl Default for FileType {
 }
 
 impl HighlightingOptions {
+    #[must_use]
     pub fn numbers(&self) -> bool {
         self.numbers
     }
 
+    #[must_use]
     pub fn strings(&self) -> bool {
         self.strings
     }
 
+    #[must_use]
     pub fn characters(&self) -> bool {
         self.characters
     }
 
+    #[must_use]
     pub fn comments(&self) -> bool {
         self.comments
     }
 
+    #[must_use]
     pub fn multiline_comments(&self) -> bool {
         self.multiline_comments
     }
 
+    #[must_use]
     pub fn primary_keywords(&self) -> &Vec<String> {
         &self.primary_keywords
     }
 
+    #[must_use]
     pub fn secondary_keywords(&self) -> &Vec<String> {
         &self.secondary_keywords
     }
 }
 
 impl FileType {
+    #[must_use]
     pub fn name(&self) -> String {
         self.name.clone()
     }
 
+    #[must_use]
     pub fn from(file_name: &str) -> Self {
         if file_name.ends_with(".rs") {
             return Self {
@@ -69,74 +78,74 @@ impl FileType {
                     comments: true,
                     multiline_comments: true,
                     primary_keywords: vec![
-                        "as".to_string(),
-                        "break".to_string(),
-                        "const".to_string(),
-                        "continue".to_string(),
-                        "crate".to_string(),
-                        "else".to_string(),
-                        "enum".to_string(),
-                        "extern".to_string(),
-                        "false".to_string(),
-                        "fn".to_string(),
-                        "for".to_string(),
-                        "if".to_string(),
-                        "impl".to_string(),
-                        "in".to_string(),
-                        "let".to_string(),
-                        "loop".to_string(),
-                        "match".to_string(),
-                        "mod".to_string(),
-                        "move".to_string(),
-                        "mut".to_string(),
-                        "pub".to_string(),
-                        "ref".to_string(),
-                        "return".to_string(),
-                        "self".to_string(),
-                        "Self".to_string(),
-                        "static".to_string(),
-                        "struct".to_string(),
-                        "super".to_string(),
-                        "trait".to_string(),
-                        "true".to_string(),
-                        "type".to_string(),
-                        "unsafe".to_string(),
-                        "use".to_string(),
-                        "where".to_string(),
-                        "while".to_string(),
-                        "dyn".to_string(),
-                        "abstract".to_string(),
-                        "become".to_string(),
-                        "box".to_string(),
-                        "do".to_string(),
-                        "final".to_string(),
-                        "macro".to_string(),
-                        "override".to_string(),
-                        "priv".to_string(),
-                        "typeof".to_string(),
-                        "unsized".to_string(),
-                        "virtual".to_string(),
-                        "yield".to_string(),
-                        "async".to_string(),
-                        "await".to_string(),
-                        "try".to_string(),
+                        "as".to_owned(),
+                        "break".to_owned(),
+                        "const".to_owned(),
+                        "continue".to_owned(),
+                        "crate".to_owned(),
+                        "else".to_owned(),
+                        "enum".to_owned(),
+                        "extern".to_owned(),
+                        "false".to_owned(),
+                        "fn".to_owned(),
+                        "for".to_owned(),
+                        "if".to_owned(),
+                        "impl".to_owned(),
+                        "in".to_owned(),
+                        "let".to_owned(),
+                        "loop".to_owned(),
+                        "match".to_owned(),
+                        "mod".to_owned(),
+                        "move".to_owned(),
+                        "mut".to_owned(),
+                        "pub".to_owned(),
+                        "ref".to_owned(),
+                        "return".to_owned(),
+                        "self".to_owned(),
+                        "Self".to_owned(),
+                        "static".to_owned(),
+                        "struct".to_owned(),
+                        "super".to_owned(),
+                        "trait".to_owned(),
+                        "true".to_owned(),
+                        "type".to_owned(),
+                        "unsafe".to_owned(),
+                        "use".to_owned(),
+                        "where".to_owned(),
+                        "while".to_owned(),
+                        "dyn".to_owned(),
+                        "abstract".to_owned(),
+                        "become".to_owned(),
+                        "box".to_owned(),
+                        "do".to_owned(),
+                        "final".to_owned(),
+                        "macro".to_owned(),
+                        "override".to_owned(),
+                        "priv".to_owned(),
+                        "typeof".to_owned(),
+                        "unsized".to_owned(),
+                        "virtual".to_owned(),
+                        "yield".to_owned(),
+                        "async".to_owned(),
+                        "await".to_owned(),
+                        "try".to_owned(),
                     ],
                     secondary_keywords: vec![
-                        "bool".to_string(),
-                        "char".to_string(),
-                        "i8".to_string(),
-                        "i16".to_string(),
-                        "i32".to_string(),
-                        "i64".to_string(),
-                        "isize".to_string(),
-                        "u8".to_string(),
-                        "u16".to_string(),
-                        "u32".to_string(),
-                        "u64".to_string(),
-                        "usize".to_string(),
-                        "f32".to_string(),
-                        "f64".to_string(),
-                        "str".to_string(),
+                        "bool".to_owned(),
+                        "char".to_owned(),
+                        "i8".to_owned(),
+                        "i16".to_owned(),
+                        "i32".to_owned(),
+                        "i64".to_owned(),
+                        "isize".to_owned(),
+                        "u8".to_owned(),
+                        "u16".to_owned(),
+                        "u32".to_owned(),
+                        "u64".to_owned(),
+                        "usize".to_owned(),
+                        "f32".to_owned(),
+                        "f64".to_owned(),
+                        "str".to_owned(),
                     ],
                 },
             };
@@ -144,6 +153,7 @@ impl FileType {
         Self::default()
     }
 
+    #[must_use]
     pub fn highlighting_options(&self) -> &HighlightingOptions {
         &self.hl_opts
     }
