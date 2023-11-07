@@ -13,6 +13,7 @@ mod filetype;
 mod highlighting;
 mod row;
 mod terminal;
+mod colortheme;
 
 pub use buffer::Buffer;
 use editor::Editor;
@@ -22,6 +23,7 @@ pub use filetype::FileType;
 pub use filetype::HighlightingOptions;
 pub use row::Row;
 pub use terminal::Terminal;
+pub use colortheme::get_colors;
 
 fn main() {
     Editor::default().run();

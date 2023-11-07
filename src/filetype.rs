@@ -147,6 +147,7 @@ impl FileType {
                         "f64".to_owned(),
                         "str".to_owned(),
                         "&str".to_owned(),
+                        "String".to_owned(),
                     ],
                 },
             };

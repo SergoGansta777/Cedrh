@@ -1,10 +1,12 @@
 use crate::Buffer;
 use crate::Row;
 use crate::Terminal;
+use crate::get_colors;
 
 use std::env;
 use std::time::Duration;
 use std::time::Instant;
+use std::collections::HashMap;
 use termion::color;
 use termion::event::Key;
 
@@ -49,6 +51,7 @@ pub struct Editor {
     status_message: StatusMessage,
     quit_times: u8,
     highlighted_word: Option<String>,
+    colors: HashMap<String, color::Rgb>,
 }
 
 impl Editor {
@@ -67,6 +70,7 @@ impl Editor {
         } else {
             Buffer::default()
         };
+        let term = env::var("TERM").unwrap_or_default();
 
         Self {
             should_quit: false,
@@ -77,6 +81,7 @@ impl Editor {
             status_message: StatusMessage::from(initial_status),
             quit_times: QUIT_TIMES,
             highlighted_word: None,
+            colors: get_colors(&term),
         }
     }
 
@@ -403,7 +408,7 @@ impl Editor {
         let width = self.terminal.size().width as usize;
         let start = self.offset.x;
         let end = self.offset.x.saturating_add(width);
-        let row = row.render(start, end);
+        let row = row.render(&self.colors, start, end);
         println!("{row}\r");
     }
 

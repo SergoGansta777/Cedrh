@@ -3,6 +3,7 @@ use crate::HighlightingOptions;
 use crate::SearchDirection;
 
 use std::cmp;
+use std::collections::HashMap;
 use termion::color;
 use unicode_segmentation::UnicodeSegmentation;
 
@@ -26,7 +27,7 @@ impl From<&str> for Row {
 }
 
 impl Row {
-    #[must_use] pub fn render(&self, start: usize, end: usize) -> String {
+    #[must_use] pub fn render(&self, colors: &HashMap<String, color::Rgb>, start: usize, end: usize) -> String {
         let end = cmp::min(end, self.string.len());
         let start = cmp::min(start, end);
         let mut result = String::new();
@@ -46,7 +47,7 @@ impl Row {
                 if highlighting_type != current_highlighting {
                     current_highlighting = highlighting_type;
                     let start_hightlight =
-                        format!("{}", termion::color::Fg(highlighting_type.to_color()));
+                        format!("{}", termion::color::Fg(highlighting_type.to_color(&colors)));
                     result.push_str(&start_hightlight);
                 }
                 if c == '\t' {
