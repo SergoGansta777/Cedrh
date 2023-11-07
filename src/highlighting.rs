@@ -13,6 +13,7 @@ pub enum Type {
     MultilineComment,
     PrimaryKeywords,
     SecondaryKeywords,
+    Operators,
 }
 
 impl Type {
@@ -25,6 +26,7 @@ impl Type {
             Type::Comment | Type::MultilineComment => colors["color6"],
             Type::PrimaryKeywords => colors["color4"],
             Type::SecondaryKeywords => colors["color5"],
+            Type::Operators => colors["color9"],
             _ => colors["color7"],
         }
     }

@@ -12,6 +12,7 @@ pub struct HighlightingOptions {
     multiline_comments: bool,
     primary_keywords: Vec<String>,
     secondary_keywords: Vec<String>,
+    operators: Vec<String>,
 }
 
 impl Default for FileType {
@@ -57,6 +58,11 @@ impl HighlightingOptions {
     #[must_use]
     pub fn secondary_keywords(&self) -> &Vec<String> {
         &self.secondary_keywords
+    }
+
+    #[must_use]
+    pub fn operators(&self) -> &Vec<String> {
+        &self.operators
     }
 }
 
@@ -148,7 +154,60 @@ impl FileType {
                         "str".to_owned(),
                         "&str".to_owned(),
                         "String".to_owned(),
+                        "Vec".to_owned(),
+                        "Box".to_owned(),
+                        "Option".to_owned(),
+                        "Result".to_owned(),
+                        "HashMap".to_owned(),
+                        "HashSet".to_owned(),
+                        "BTreeMap".to_owned(),
+                        "BTreeSet".to_owned(),
+                        "RefCell".to_owned(),
+                        "Rc".to_owned(),
+                        "Arc".to_owned(),
+                        "Cell".to_owned(),
+                        "Ref".to_owned(),
+                        "Mutex".to_owned(),
+                        "RwLock".to_owned(),
                     ],
+                    operators: vec! [
+                        "+".to_owned(),
+                        "-".to_owned(),
+                        "*".to_owned(),
+                        "/".to_owned(),
+                        "%".to_owned(),
+                        "&".to_owned(),
+                        "|".to_owned(),
+                        "!".to_owned(),
+                        "^".to_owned(),
+                        "~".to_owned(),
+                        "<<".to_owned(),
+                        ">>".to_owned(),
+                        "&&".to_owned(),
+                        "||".to_owned(),
+                        "<".to_owned(),
+                        ">".to_owned(),
+                        "<=".to_owned(),
+                        ">=".to_owned(),
+                        "==".to_owned(),
+                        "!=".to_owned(),
+                        "=".to_owned(),
+                        "+=".to_owned(),
+                        "-=".to_owned(),
+                        "*=".to_owned(),
+                        "/=".to_owned(),
+                        "%=".to_owned(),
+                        "&=".to_owned(),
+                        "|=".to_owned(),
+                        "^=".to_owned(),
+                        "<<=".to_owned(),
+                        ">>=".to_owned(),
+                        "&&=".to_owned(),
+                        "||=".to_owned(),
+                        "=>".to_owned(),
+                        "::".to_owned(),
+                        "()".to_owned(),
+                    ]
                 },
             };
         }

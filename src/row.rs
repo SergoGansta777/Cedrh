@@ -294,6 +294,20 @@ impl Row {
         )
     }
 
+    fn highlight_operators(
+        &mut self,
+        index: &mut usize,
+        opts: &HighlightingOptions,
+        chars: &[char],
+    ) -> bool {
+        for word in opts.operators() {
+            if self.highlight_str(index, word, chars, highlighting::Type::Operators) {
+                return true;
+            }
+        }
+        false
+    }
+
     fn highlight_char(
         &mut self,
         index: &mut usize,
@@ -469,6 +483,7 @@ impl Row {
                 || self.highlight_comment(&mut index, opts, *c, &chars)
                 || self.highlight_primary_keywords(&mut index, opts, &chars)
                 || self.highlight_secondary_keywords(&mut index, opts, &chars)
+                || self.highlight_operators(&mut index, opts, &chars)
                 || self.highlight_string(&mut index, opts, *c, &chars)
                 || self.highlight_number(&mut index, opts, *c, &chars)
             {
