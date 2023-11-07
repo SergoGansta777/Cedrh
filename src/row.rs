@@ -314,7 +314,7 @@ impl Row {
         chars: &[char],
     ) -> bool {
         for word in opts.brackets() {
-            if self.highlight_str(index, word, chars, highlighting::Type::Brakets) {
+            if self.highlight_str(index, word, chars, highlighting::Type::Brackets) {
                 return true;
             }
         }
@@ -516,7 +516,7 @@ impl Row {
 }
 
 fn is_separator(c: char) -> bool {
-    c.is_ascii_punctuation() || c.is_ascii_whitespace()
+    (c.is_ascii_punctuation() && c != '_') || c.is_ascii_whitespace()
 }
 
 #[cfg(test)]

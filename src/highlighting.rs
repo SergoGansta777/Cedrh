@@ -14,7 +14,7 @@ pub enum Type {
     PrimaryKeywords,
     SecondaryKeywords,
     Operators,
-    Brakets,
+    Brackets,
 }
 
 impl Type {
@@ -28,7 +28,7 @@ impl Type {
             Type::PrimaryKeywords => colors["color4"],
             Type::SecondaryKeywords => colors["color5"],
             Type::Operators => colors["color9"],
-            Type::Brakets => colors["color3"],
+            Type::Brackets => colors["color3"],
             _ => colors["color7"],
         }
     }

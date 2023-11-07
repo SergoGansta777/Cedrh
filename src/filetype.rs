@@ -161,7 +161,6 @@ impl FileType {
                         "f32".to_owned(),
                         "f64".to_owned(),
                         "str".to_owned(),
-                        "&str".to_owned(),
                         "String".to_owned(),
                         "Vec".to_owned(),
                         "Box".to_owned(),
@@ -179,7 +178,7 @@ impl FileType {
                         "Mutex".to_owned(),
                         "RwLock".to_owned(),
                     ],
-                    operators: vec! [
+                    operators: vec![
                         "+".to_owned(),
                         "-".to_owned(),
                         "*".to_owned(),
@@ -228,7 +227,7 @@ impl FileType {
                         "<".to_owned(),
                         ">".to_owned(),
                         "#".to_owned(),
-                    ]
+                    ],
                 },
             };
         }
