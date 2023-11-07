@@ -5,6 +5,7 @@ use std::time::Instant;
 
 use termion::color;
 use termion::event::Key;
+use unicode_segmentation::UnicodeSegmentation;
 
 use crate::Buffer;
 use crate::get_colors;
@@ -186,7 +187,10 @@ impl Editor {
             self.refresh_screen()?;
             let key = Terminal::read_key()?;
             match key {
-                Key::Backspace => result.truncate(result.len().saturating_sub(1)),
+                Key::Backspace => {
+                    let graphemes_count = result.graphemes(true).count();
+                    result = result.graphemes(true).take(graphemes_count.saturating_sub(1)).collect();
+                }
                 Key::Char('\n') => break,
                 Key::Char(c) => {
                     if !c.is_control() {
