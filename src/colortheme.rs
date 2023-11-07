@@ -6,7 +6,9 @@ use termion::color::Rgb;
 
 pub fn get_colors(term: &str) -> HashMap<String, Rgb> {
     match term {
-        "xterm-kitty" | "ansi" => parse_kitty_config("/Users/sergejnehorosev/.config/kitty/current-theme.conf").unwrap(),
+        "xterm-kitty" | "ansi" => {
+            parse_kitty_config("/Users/sergejnehorosev/.config/kitty/current-theme.conf").unwrap()
+        }
         _ => {
             let mut colors = HashMap::new();
             colors.insert("active_border_color".to_owned(), Rgb(0, 0, 0));
@@ -42,7 +44,11 @@ fn parse_kitty_config(file_path: &str) -> Result<HashMap<String, Rgb>> {
     for line in reader.lines() {
         let line = line?;
 
-        if line.starts_with("color") || line.starts_with("foreground") || line.starts_with("background") || line.starts_with("active_border_color") {
+        if line.starts_with("color")
+            || line.starts_with("foreground")
+            || line.starts_with("background")
+            || line.starts_with("active_border_color")
+        {
             let mut parts = line.split_whitespace();
             match (parts.nth(0), parts.nth(0)) {
                 (Some(color_name), Some(color_value)) => {
@@ -56,8 +62,11 @@ fn parse_kitty_config(file_path: &str) -> Result<HashMap<String, Rgb>> {
 }
 
 fn parse_hex_to_rgb(hex_code: &str) -> Rgb {
-    let red = u8::from_str_radix(&hex_code[1..3], 16).unwrap_or_else(|_| panic!("Invalid red hex code: {}", hex_code));
-    let green = u8::from_str_radix(&hex_code[3..5], 16).unwrap_or_else(|_| panic!("Invalid green hex code: {}", hex_code));
-    let blue = u8::from_str_radix(&hex_code[5..7], 16).unwrap_or_else(|_| panic!("Invalid blue hex code: {}", hex_code));
+    let red = u8::from_str_radix(&hex_code[1..3], 16)
+        .unwrap_or_else(|_| panic!("Invalid red hex code: {}", hex_code));
+    let green = u8::from_str_radix(&hex_code[3..5], 16)
+        .unwrap_or_else(|_| panic!("Invalid green hex code: {}", hex_code));
+    let blue = u8::from_str_radix(&hex_code[5..7], 16)
+        .unwrap_or_else(|_| panic!("Invalid blue hex code: {}", hex_code));
     Rgb(red, green, blue)
 }

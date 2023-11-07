@@ -59,7 +59,7 @@ impl Buffer {
             return;
         }
         #[allow(clippy::indexing_slicing)]
-            let current_row = &mut self.rows[at.y];
+        let current_row = &mut self.rows[at.y];
         let new_row = current_row.split(at.x);
         #[allow(clippy::arithmetic_side_effects)]
         self.rows.insert(at.y + 1, new_row);
@@ -78,7 +78,7 @@ impl Buffer {
             self.rows.push(row);
         } else {
             #[allow(clippy::indexing_slicing)]
-                let row = &mut self.rows[at.y];
+            let row = &mut self.rows[at.y];
             row.insert(at.x, c);
         }
         self.unhighlight_rows(at.y);
@@ -186,5 +186,3 @@ impl Buffer {
         }
     }
 }
-
-

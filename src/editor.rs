@@ -7,8 +7,8 @@ use termion::color;
 use termion::event::Key;
 use unicode_segmentation::UnicodeSegmentation;
 
-use crate::Buffer;
 use crate::get_colors;
+use crate::Buffer;
 use crate::Row;
 use crate::Terminal;
 
@@ -156,11 +156,16 @@ impl Editor {
             self.buffer.len()
         );
         #[allow(clippy::integer_arithmetic)]
-            let len = status.len() + line_indicator.len();
+        let len = status.len() + line_indicator.len();
         status.push_str(&" ".repeat(width.saturating_sub(len)));
         status = format!("{}{}", status, line_indicator);
         status.truncate(width);
-        Terminal::set_bg_color(*self.colors.get("active_border_color").unwrap_or(&self.colors["foreground"]));
+        Terminal::set_bg_color(
+            *self
+                .colors
+                .get("active_border_color")
+                .unwrap_or(&self.colors["foreground"]),
+        );
         Terminal::set_fg_color(self.colors["background"]);
         println!("{}\r", status);
         Terminal::reset_fg_color();
@@ -177,8 +182,8 @@ impl Editor {
     }
 
     fn prompt<C>(&mut self, prompt: &str, mut callback: C) -> Result<Option<String>, std::io::Error>
-        where
-            C: FnMut(&mut Self, Key, &String),
+    where
+        C: FnMut(&mut Self, Key, &String),
     {
         let mut result = String::new();
         loop {
@@ -188,7 +193,10 @@ impl Editor {
             match key {
                 Key::Backspace => {
                     let graphemes_count = result.graphemes(true).count();
-                    result = result.graphemes(true).take(graphemes_count.saturating_sub(1)).collect();
+                    result = result
+                        .graphemes(true)
+                        .take(graphemes_count.saturating_sub(1))
+                        .collect();
                 }
                 Key::Char('\n') => break,
                 Key::Char(c) => {
@@ -399,7 +407,7 @@ impl Editor {
         let width = self.terminal.size().width as usize;
         let len = welcome_message.len();
         #[allow(clippy::arithmetic_side_effects, clippy::integer_division)]
-            let padding = width.saturating_sub(len) / 2;
+        let padding = width.saturating_sub(len) / 2;
         let spaces = " ".repeat(padding.saturating_sub(1));
 
         welcome_message = format!("~{spaces}{welcome_message}");

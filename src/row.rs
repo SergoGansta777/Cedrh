@@ -48,8 +48,10 @@ impl Row {
                     .unwrap_or(&highlighting::Type::None);
                 if highlighting_type != current_highlighting {
                     current_highlighting = highlighting_type;
-                    let start_hightlight =
-                        format!("{}", termion::color::Fg(highlighting_type.to_color(&colors)));
+                    let start_hightlight = format!(
+                        "{}",
+                        termion::color::Fg(highlighting_type.to_color(&colors))
+                    );
                     result.push_str(&start_hightlight);
                 }
                 if c == '\t' {
@@ -164,7 +166,7 @@ impl Row {
         };
 
         #[allow(clippy::arithmetic_side_effects)]
-            let substring: String = self.string[..]
+        let substring: String = self.string[..]
             .graphemes(true)
             .skip(start)
             .take(end - start)
@@ -177,7 +179,7 @@ impl Row {
 
         if let Some(matching_byte_index) = matching_byte_index {
             for (grapheme_index, (byte_index, _)) in
-            substring[..].grapheme_indices(true).enumerate()
+                substring[..].grapheme_indices(true).enumerate()
             {
                 if matching_byte_index == byte_index {
                     #[allow(clippy::arithmetic_side_effects)]
@@ -244,7 +246,7 @@ impl Row {
     ) -> bool {
         if *index > 0 {
             #[allow(clippy::indexing_slicing, clippy::arithmetic_side_effects)]
-                let prev_char = chars[*index - 1];
+            let prev_char = chars[*index - 1];
             if !is_separator(prev_char) {
                 return false;
             }
@@ -252,7 +254,7 @@ impl Row {
         for word in keywords {
             if *index < chars.len().saturating_sub(word.len()) {
                 #[allow(clippy::indexing_slicing, clippy::arithmetic_side_effects)]
-                    let next_char = chars[*index + word.len()];
+                let next_char = chars[*index + word.len()];
                 if !is_separator(next_char) {
                     continue;
                 }
@@ -411,7 +413,7 @@ impl Row {
         if opts.numbers() && c.is_ascii_digit() {
             if *index > 0 {
                 #[allow(clippy::indexing_slicing, clippy::arithmetic_side_effects)]
-                    let prev_char = chars[*index - 1];
+                let prev_char = chars[*index - 1];
                 if !is_separator(prev_char) {
                     return false;
                 }
