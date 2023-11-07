@@ -9,6 +9,9 @@ pub fn get_colors(term: &str) -> HashMap<String, Rgb> {
         "xterm-kitty" | "ansi" => parse_kitty_config("/Users/sergejnehorosev/.config/kitty/current-theme.conf").unwrap(),
         _ => {
             let mut colors = HashMap::new();
+            colors.insert("active_border_color".to_owned(), Rgb(0, 0, 0));
+            colors.insert("foreground".to_owned(), Rgb(63, 63, 63));
+            colors.insert("background".to_owned(), Rgb(253, 253, 253));
             colors.insert("color0".to_owned(), Rgb(220, 163, 163));
             colors.insert("color1".to_owned(), Rgb(38, 139, 210));
             colors.insert("color2".to_owned(), Rgb(41, 174, 26));
@@ -39,7 +42,7 @@ fn parse_kitty_config(file_path: &str) -> Result<HashMap<String, Rgb>> {
     for line in reader.lines() {
         let line = line?;
 
-        if line.starts_with("color") {
+        if line.starts_with("color") || line.starts_with("foreground") || line.starts_with("background") || line.starts_with("active_border_color") {
             let mut parts = line.split_whitespace();
             match (parts.nth(0), parts.nth(0)) {
                 (Some(color_name), Some(color_value)) => {

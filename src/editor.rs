@@ -12,8 +12,6 @@ use crate::get_colors;
 use crate::Row;
 use crate::Terminal;
 
-const STATUS_FG_COLOR: color::Rgb = color::Rgb(63, 63, 63);
-const STATUS_BG_COLOR: color::Rgb = color::Rgb(239, 239, 239);
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const EDITOR_NAME: &str = "Sedrh";
 const QUIT_TIMES: u8 = 1;
@@ -162,8 +160,8 @@ impl Editor {
         status.push_str(&" ".repeat(width.saturating_sub(len)));
         status = format!("{}{}", status, line_indicator);
         status.truncate(width);
-        Terminal::set_bg_color(STATUS_BG_COLOR);
-        Terminal::set_fg_color(STATUS_FG_COLOR);
+        Terminal::set_bg_color(*self.colors.get("active_border_color").unwrap_or(&self.colors["foreground"]));
+        Terminal::set_fg_color(self.colors["background"]);
         println!("{}\r", status);
         Terminal::reset_fg_color();
         Terminal::reset_bg_color();
