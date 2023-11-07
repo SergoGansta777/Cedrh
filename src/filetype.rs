@@ -13,6 +13,7 @@ pub struct HighlightingOptions {
     primary_keywords: Vec<String>,
     secondary_keywords: Vec<String>,
     operators: Vec<String>,
+    brackets: Vec<String>,
 }
 
 impl Default for FileType {
@@ -63,6 +64,11 @@ impl HighlightingOptions {
     #[must_use]
     pub fn operators(&self) -> &Vec<String> {
         &self.operators
+    }
+
+    #[must_use]
+    pub fn brackets(&self) -> &Vec<String> {
+        &self.brackets
     }
 }
 
@@ -135,6 +141,9 @@ impl FileType {
                         "async".to_owned(),
                         "await".to_owned(),
                         "try".to_owned(),
+                        "Ok".to_owned(),
+                        "Some".to_owned(),
+                        "Err".to_owned(),
                     ],
                     secondary_keywords: vec![
                         "bool".to_owned(),
@@ -178,6 +187,7 @@ impl FileType {
                         "%".to_owned(),
                         "&".to_owned(),
                         "|".to_owned(),
+                        ":".to_owned(),
                         "!".to_owned(),
                         "^".to_owned(),
                         "~".to_owned(),
@@ -192,6 +202,7 @@ impl FileType {
                         "==".to_owned(),
                         "!=".to_owned(),
                         "=".to_owned(),
+                        ".".to_owned(),
                         "+=".to_owned(),
                         "-=".to_owned(),
                         "*=".to_owned(),
@@ -206,7 +217,17 @@ impl FileType {
                         "||=".to_owned(),
                         "=>".to_owned(),
                         "::".to_owned(),
-                        "()".to_owned(),
+                    ],
+                    brackets: vec![
+                        "(".to_owned(),
+                        ")".to_owned(),
+                        "[".to_owned(),
+                        "]".to_owned(),
+                        "{".to_owned(),
+                        "}".to_owned(),
+                        "<".to_owned(),
+                        ">".to_owned(),
+                        "#".to_owned(),
                     ]
                 },
             };

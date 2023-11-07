@@ -307,6 +307,19 @@ impl Row {
         }
         false
     }
+    fn highlight_brackets(
+        &mut self,
+        index: &mut usize,
+        opts: &HighlightingOptions,
+        chars: &[char],
+    ) -> bool {
+        for word in opts.brackets() {
+            if self.highlight_str(index, word, chars, highlighting::Type::Brakets) {
+                return true;
+            }
+        }
+        false
+    }
 
     fn highlight_char(
         &mut self,
@@ -486,6 +499,7 @@ impl Row {
                 || self.highlight_operators(&mut index, opts, &chars)
                 || self.highlight_string(&mut index, opts, *c, &chars)
                 || self.highlight_number(&mut index, opts, *c, &chars)
+                || self.highlight_brackets(&mut index, opts, &chars)
             {
                 continue;
             }
