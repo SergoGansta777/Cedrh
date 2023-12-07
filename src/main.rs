@@ -8,6 +8,9 @@
     clippy::exhaustive_enums,
     clippy::exhaustive_structs,
     clippy::single_match,
+    clippy::missing_errors_doc,
+    clippy::missing_panics_doc,
+    clippy::struct_excessive_bools,
 )]
 
 pub use buffer::Buffer;

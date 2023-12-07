@@ -74,7 +74,7 @@ impl Editor {
 
         Self {
             should_quit: false,
-            terminal: Terminal::default().expect("Failed to initialize terminal"),
+            terminal: Terminal::new().expect("Failed to initialize terminal"),
             buffer,
             cursor_position: Position::default(),
             offset: Position::default(),
@@ -158,7 +158,7 @@ impl Editor {
         #[allow(clippy::arithmetic_side_effects)]
         let len = status.len() + line_indicator.len();
         status.push_str(&" ".repeat(width.saturating_sub(len)));
-        status = format!("{}{}", status, line_indicator);
+        status = format!("{status}{line_indicator}");
         status.truncate(width);
         Terminal::set_bg_color(
             *self
@@ -167,7 +167,7 @@ impl Editor {
                 .unwrap_or(&self.colors["foreground"]),
         );
         Terminal::set_fg_color(self.colors["background"]);
-        println!("{}\r", status);
+        println!("{status}\r");
         Terminal::reset_fg_color();
         Terminal::reset_bg_color();
     }
