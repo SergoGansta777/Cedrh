@@ -27,6 +27,5 @@ mod row;
 mod terminal;
 
 fn main() {
-    // Hello here again
     Editor::default().run();
 }
