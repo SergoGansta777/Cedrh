@@ -55,7 +55,7 @@ pub struct Editor {
 }
 
 impl Editor {
-    pub fn default() -> Self {
+    pub fn new() -> Self {
         let args: Vec<String> = env::args().collect();
         let mut initial_status =
             String::from("HELP: Ctrl-q = quit | Ctrl-s = save | Ctrl-f = find");

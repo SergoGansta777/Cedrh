@@ -10,7 +10,7 @@
     clippy::single_match,
     clippy::missing_errors_doc,
     clippy::missing_panics_doc,
-    clippy::struct_excessive_bools,
+    clippy::struct_excessive_bools
 )]
 
 pub use buffer::Buffer;
@@ -33,5 +33,5 @@ mod row;
 mod terminal;
 
 fn main() {
-    Editor::default().run();
+    Editor::new().run();
 }
