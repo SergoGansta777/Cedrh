@@ -48,10 +48,8 @@ impl Row {
                     .unwrap_or(&highlighting::Type::None);
                 if highlighting_type != current_highlighting {
                     current_highlighting = highlighting_type;
-                    let start_hightlight = format!(
-                        "{}",
-                        termion::color::Fg(highlighting_type.to_color(&colors))
-                    );
+                    let start_hightlight =
+                        format!("{}", termion::color::Fg(highlighting_type.to_color(colors)));
                     result.push_str(&start_hightlight);
                 }
                 if c == '\t' {
@@ -118,6 +116,7 @@ impl Row {
         self.len += new.len;
     }
 
+    #[must_use]
     pub fn split(&mut self, at: usize) -> Self {
         let mut row: String = String::new();
         let mut length = 0;
@@ -414,8 +413,6 @@ impl Row {
                         if let Some(prev_char) = chars.get(*index - 1) {
                             if *prev_char != '\\' {
                                 break;
-                            } else {
-                                continue;
                             }
                         };
                     }
@@ -551,7 +548,7 @@ mod test_super {
                 highlighting::Type::Match
             ],
             row.highlighting
-        )
+        );
     }
 
     #[test]
