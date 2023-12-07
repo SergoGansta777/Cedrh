@@ -7,7 +7,7 @@ use termion::color;
 use termion::event::Key;
 use unicode_segmentation::UnicodeSegmentation;
 
-use crate::get_colors;
+use crate::colortheme::get_colors;
 use crate::Buffer;
 use crate::Row;
 use crate::Terminal;
