@@ -14,7 +14,6 @@
 )]
 
 pub use buffer::Buffer;
-pub use colortheme::get_colors;
 pub use editor::Position;
 pub use editor::SearchDirection;
 pub use filetype::FileType;

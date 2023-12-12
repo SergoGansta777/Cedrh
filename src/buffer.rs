@@ -1,4 +1,6 @@
 use std::fs;
+use std::fs::File;
+use std::io::{self, BufRead, BufReader};
 use std::io::{Error, Write};
 
 use crate::FileType;
@@ -15,13 +17,15 @@ pub struct Buffer {
 }
 
 impl Buffer {
-    pub fn open(filename: &str) -> Result<Self, std::io::Error> {
-        let contents = fs::read_to_string(filename)?;
+    pub fn open(filename: &str) -> io::Result<Self> {
+        let file = File::open(filename)?;
+        let reader = BufReader::new(file);
         let file_type = FileType::from(filename);
-        let mut rows = Vec::new();
-        for value in contents.lines() {
-            rows.push(Row::from(value));
-        }
+        let rows = reader
+            .lines()
+            .map(|line_result| line_result.map(|line| Row::from(line.as_str())))
+            .collect::<Result<Vec<_>, io::Error>>()?;
+
         Ok(Self {
             rows,
             file_name: Some(filename.to_string()),

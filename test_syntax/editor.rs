@@ -7,7 +7,7 @@ use termion::color;
 use termion::event::Key;
 use unicode_segmentation::UnicodeSegmentation;
 
-use crate::colortheme::get_colors;
+use crate::get_colors;
 use crate::Buffer;
 use crate::Row;
 use crate::Terminal;
@@ -57,8 +57,6 @@ pub struct Editor {
 impl Editor {
     pub fn new() -> Self {
         let args: Vec<String> = env::args().collect();
-        let term = env::var("TERM").unwrap_or_default();
-
         let mut initial_status =
             String::from("HELP: Ctrl-q = quit | Ctrl-s = save | Ctrl-f = find");
         let buffer = if let Some(file_name) = args.get(1) {
@@ -72,6 +70,7 @@ impl Editor {
         } else {
             Buffer::default()
         };
+        let term = env::var("TERM").unwrap_or_default();
 
         Self {
             should_quit: false,
@@ -104,7 +103,6 @@ impl Editor {
 
     fn refresh_screen(&mut self) -> Result<(), std::io::Error> {
         Terminal::cursor_hide();
-        Terminal::change_cursor();
         Terminal::cursor_position(&Position::default());
         if self.should_quit {
             Terminal::clear_screen();
@@ -157,7 +155,6 @@ impl Editor {
             self.cursor_position.y.saturating_add(1),
             self.buffer.len()
         );
-
         #[allow(clippy::arithmetic_side_effects)]
         let len = status.len() + line_indicator.len();
         status.push_str(&" ".repeat(width.saturating_sub(len)));
@@ -406,21 +403,14 @@ impl Editor {
     }
 
     fn draw_welcome_message(&self) {
-        let info_message = format!("{EDITOR_NAME} editor --version {VERSION}");
-        let welcome_messages = vec![info_message.as_str(), "Welcome to the club!"];
-        for message in welcome_messages {
-            self.draw_message_row(message);
-        }
-    }
-
-    fn draw_message_row(&self, message: &str) {
+        let mut welcome_message = format!("{EDITOR_NAME} editor --version {VERSION}");
         let width = self.terminal.size().width as usize;
-        let len = message.len();
+        let len = welcome_message.len();
         #[allow(clippy::arithmetic_side_effects, clippy::integer_division)]
         let padding = width.saturating_sub(len) / 2;
         let spaces = " ".repeat(padding.saturating_sub(1));
 
-        let mut welcome_message = format!("~{spaces}{message}");
+        welcome_message = format!("~{spaces}{welcome_message}");
         welcome_message.truncate(width);
 
         println!("{welcome_message}\r");
