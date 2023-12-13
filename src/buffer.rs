@@ -1,5 +1,6 @@
-use std::fs;
-use std::io::{Error, Write};
+use std::fs::File;
+use std::io::{self, BufRead, BufReader, BufWriter, Error, Write};
+use std::usize;
 
 use crate::FileType;
 use crate::Position;
@@ -15,13 +16,15 @@ pub struct Buffer {
 }
 
 impl Buffer {
-    pub fn open(filename: &str) -> Result<Self, std::io::Error> {
-        let contents = fs::read_to_string(filename)?;
+    pub fn open(filename: &str) -> io::Result<Self> {
+        let file = File::open(filename)?;
+        let reader = BufReader::new(file);
         let file_type = FileType::from(filename);
-        let mut rows = Vec::new();
-        for value in contents.lines() {
-            rows.push(Row::from(value));
-        }
+        let rows = reader
+            .lines()
+            .map(|line_result| line_result.map(|line| Row::from(line.as_str())))
+            .collect::<Result<Vec<_>, io::Error>>()?;
+
         Ok(Self {
             rows,
             file_name: Some(filename.to_string()),
@@ -111,13 +114,16 @@ impl Buffer {
 
     pub fn save(&mut self) -> Result<(), Error> {
         if let Some(file_name) = &self.file_name {
-            let mut file = fs::File::create(file_name)?;
-            self.file_type = FileType::from(file_name);
-            for row in &mut self.rows {
-                file.write_all(row.as_bytes())?;
-                file.write_all(b"\n")?;
+            let file = File::create(file_name)?;
+            let mut writer = BufWriter::new(file);
+
+            for row in &self.rows {
+                writer.write_all(row.as_bytes())?;
+                writer.write_all(b"\n")?;
             }
+
             self.modificated = false;
+            writer.flush()?;
         }
         Ok(())
     }
@@ -127,12 +133,10 @@ impl Buffer {
         self.modificated
     }
 
+    //TODO: refactor this
     #[allow(clippy::indexing_slicing)]
     #[must_use]
     pub fn find(&self, query: &str, at: &Position, direction: SearchDirection) -> Option<Position> {
-        if at.y >= self.rows.len() {
-            return None;
-        }
         let mut position = Position { x: at.x, y: at.y };
 
         let start = if direction == SearchDirection::Forward {

@@ -1,5 +1,7 @@
+use std::borrow::Cow;
 use std::cmp;
 use std::collections::HashMap;
+use std::fmt::Write;
 
 use termion::color;
 use unicode_segmentation::UnicodeSegmentation;
@@ -32,35 +34,39 @@ impl Row {
     pub fn render(&self, colors: &HashMap<String, color::Rgb>, start: usize, end: usize) -> String {
         let end = cmp::min(end, self.string.len());
         let start = cmp::min(start, end);
-        let mut result = String::new();
-        let mut current_highlighting = &highlighting::Type::None;
-        #[allow(clippy::arithmetic_side_effects)]
+        let mut result = String::with_capacity(end - start);
+        let mut current_highlighting: Cow<highlighting::Type> =
+            Cow::Borrowed(&highlighting::Type::None);
+
         for (index, grapheme) in self.string[..]
             .graphemes(true)
             .enumerate()
             .skip(start)
             .take(end - start)
         {
-            if let Some(c) = grapheme.chars().next() {
-                let highlighting_type = self
-                    .highlighting
-                    .get(index)
-                    .unwrap_or(&highlighting::Type::None);
-                if highlighting_type != current_highlighting {
-                    current_highlighting = highlighting_type;
-                    let start_hightlight =
-                        format!("{}", termion::color::Fg(highlighting_type.to_color(colors)));
-                    result.push_str(&start_hightlight);
-                }
-                if c == '\t' {
-                    result.push(' ');
-                } else {
-                    result.push(c);
-                }
+            let highlighting_type = self
+                .highlighting
+                .get(index)
+                .unwrap_or(&highlighting::Type::None);
+
+            if highlighting_type != &*current_highlighting {
+                current_highlighting = Cow::Borrowed(highlighting_type);
+                write!(
+                    result,
+                    "{}",
+                    termion::color::Fg(highlighting_type.to_color(colors))
+                )
+                .unwrap();
+            }
+
+            if grapheme == "\t" {
+                result.push(' ');
+            } else {
+                result.push_str(grapheme);
             }
         }
-        let end_highlight = format!("{}", color::Fg(color::Reset));
-        result.push_str(&end_highlight);
+
+        write!(result, "{}", termion::color::Fg(color::Reset)).unwrap();
         result
     }
 
@@ -77,21 +83,20 @@ impl Row {
     pub fn insert(&mut self, at: usize, c: char) {
         if at >= self.len() {
             self.string.push(c);
-            self.len += 1;
-            return;
-        }
-        let mut result: String = String::new();
-        let mut length = 0;
-        for (index, grapheme) in self.string[..].graphemes(true).enumerate() {
-            length += 1;
-            if index == at {
-                length += 1;
-                result.push(c);
+        } else {
+            let grapheme_indices: Vec<_> = self.string.grapheme_indices(true).collect();
+            if let Some((byte_index, _)) = grapheme_indices.get(at) {
+                self.string.insert_str(*byte_index, &c.to_string());
+            } else {
+                self.string.push(c);
             }
-            result.push_str(grapheme);
         }
-        self.len = length;
-        self.string = result;
+        self.len += 1;
+    }
+
+    pub fn append(&mut self, new: &Self) {
+        self.string = format!("{}{}", self.string, new.string);
+        self.len += new.len;
     }
 
     pub fn delete(&mut self, at: usize) {
@@ -111,30 +116,23 @@ impl Row {
         self.string = result;
     }
 
-    pub fn append(&mut self, new: &Self) {
-        self.string = format!("{}{}", self.string, new.string);
-        self.len += new.len;
-    }
-
     #[must_use]
     pub fn split(&mut self, at: usize) -> Self {
-        let mut row: String = String::new();
-        let mut length = 0;
-        let mut splitted_row: String = String::new();
-        let mut splitted_length = 0;
-        for (index, grapheme) in self.string[..].graphemes(true).enumerate() {
-            if index < at {
-                length += 1;
-                row.push_str(grapheme);
-            } else {
-                splitted_length += 1;
-                splitted_row.push_str(grapheme);
-            }
-        }
+        let byte_index = self
+            .string
+            .grapheme_indices(true)
+            .nth(at)
+            .map_or(self.string.len(), |(index, _)| index);
 
-        self.string = row;
+        let splitted_row = self.string[byte_index..].to_string();
+        self.string.truncate(byte_index);
+
+        let length = self.string.graphemes(true).count();
+        let splitted_length = splitted_row.graphemes(true).count();
+
         self.len = length;
         self.is_highlighted = false;
+
         Self {
             string: splitted_row,
             highlighting: Vec::new(),

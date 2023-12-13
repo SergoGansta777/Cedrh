@@ -10,11 +10,10 @@
     clippy::single_match,
     clippy::missing_errors_doc,
     clippy::missing_panics_doc,
-    clippy::struct_excessive_bools,
+    clippy::struct_excessive_bools
 )]
 
 pub use buffer::Buffer;
-pub use colortheme::get_colors;
 pub use editor::Position;
 pub use editor::SearchDirection;
 pub use filetype::FileType;

@@ -82,7 +82,7 @@ impl FileType {
     pub fn from(file_name: &str) -> Self {
         match file_name.rsplit('.').next() {
             Some("rs") => Self::get_rust_filetype(),
-            Some("cpp") | Some("h") => Self::get_cpp_filetype(),
+            Some("cpp" | "h") => Self::get_cpp_filetype(),
             Some("py") => Self::get_python_filetype(),
             Some("cs") => Self::get_csharp_filetype(),
             _ => Self::default(),
@@ -90,7 +90,7 @@ impl FileType {
     }
 
     fn get_rust_filetype() -> FileType {
-        return FileType {
+        FileType {
             name: String::from("Rust"),
             hl_opts: HighlightingOptions {
                 numbers: true,
@@ -238,7 +238,7 @@ impl FileType {
                     "#".to_owned(),
                 ],
             },
-        };
+        }
     }
 
     fn get_cpp_filetype() -> FileType {
@@ -337,7 +337,7 @@ impl FileType {
                     "struct",
                 ]
                 .iter()
-                .map(|s| s.to_string())
+                .map(|s| (*s).to_string())
                 .collect(),
                 secondary_keywords: vec![
                     "bool",
@@ -364,7 +364,7 @@ impl FileType {
                     "priority_queue",
                 ]
                 .iter()
-                .map(|s| s.to_string())
+                .map(|s| (*s).to_string())
                 .collect(),
                 operators: vec![
                     "+", "-", "*", "/", "%", "^", "&", "|", "~", "!", "=", "<", ">", "+=", "-=",
@@ -372,11 +372,11 @@ impl FileType {
                     ">=", "&&", "||", "++", "--", ",", "->*", "->", ";", ":", "?", "::",
                 ]
                 .iter()
-                .map(|s| s.to_string())
+                .map(|s| (*s).to_string())
                 .collect(),
-                brackets: vec!["{", "}", "(", ")", "[", "]"]
+                brackets: ["{", "}", "(", ")", "[", "]"]
                     .iter()
-                    .map(|s| s.to_string())
+                    .map(|s| (*s).to_string())
                     .collect(),
             },
         }
@@ -398,25 +398,25 @@ impl FileType {
                     "or", "pass", "raise", "return", "try", "while", "with", "yield",
                 ]
                 .iter()
-                .map(|s| s.to_string())
+                .map(|s| (*s).to_string())
                 .collect(),
-                secondary_keywords: vec![
+                secondary_keywords: [
                     "print", "len", "range", "int", "float", "str", "input", "open", "file", "os",
                     "sys",
                 ]
                 .iter()
-                .map(|s| s.to_string())
+                .map(|s| (*s).to_string())
                 .collect(),
                 operators: vec![
                     "+", "-", "*", "**", "/", "//", "%", "@", "<<", ">>", "&", "|", "^", "~", "<",
                     ">", "<=", ">=", "==", "!=",
                 ]
                 .iter()
-                .map(|s| s.to_string())
+                .map(|s| (*s).to_string())
                 .collect(),
-                brackets: vec!["(", ")", "[", "]", "{", "}"]
+                brackets: ["(", ")", "[", "]", "{", "}"]
                     .iter()
-                    .map(|s| s.to_string())
+                    .map(|s| (*s).to_string())
                     .collect(),
             },
         }
@@ -504,7 +504,7 @@ impl FileType {
                     "while",
                 ]
                 .iter()
-                .map(|s| s.to_string())
+                .map(|s| (*s).to_string())
                 .collect(),
                 secondary_keywords: vec![
                     "Console",
@@ -528,7 +528,7 @@ impl FileType {
                     "Tasks",
                 ]
                 .iter()
-                .map(|s| s.to_string())
+                .map(|s| (*s).to_string())
                 .collect(),
                 operators: vec![
                     "+", "-", "*", "/", "%", "&", "|", "^", "!", "~", "&&", "||", "++", "--", "==",
@@ -536,11 +536,11 @@ impl FileType {
                     "&=", "|=", "^=", "<<=", ">>=", "??", "?", ":", "::", ";", ".", ",",
                 ]
                 .iter()
-                .map(|s| s.to_string())
+                .map(|s| (*s).to_string())
                 .collect(),
-                brackets: vec!["{", "}", "(", ")", "[", "]"]
+                brackets: ["{", "}", "(", ")", "[", "]"]
                     .iter()
-                    .map(|s| s.to_string())
+                    .map(|s| (*s).to_string())
                     .collect(),
             },
         }

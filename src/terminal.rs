@@ -67,6 +67,10 @@ impl Terminal {
         print!("{}", termion::cursor::Show);
     }
 
+    pub fn change_cursor() {
+        print!("{}", termion::cursor::BlinkingBar);
+    }
+
     pub fn clear_current_line() {
         print!("{}", termion::clear::CurrentLine);
     }
