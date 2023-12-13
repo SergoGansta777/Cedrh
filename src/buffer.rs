@@ -117,7 +117,7 @@ impl Buffer {
             let file = File::create(file_name)?;
             let mut writer = BufWriter::new(file);
 
-            for row in self.rows.iter() {
+            for row in &self.rows {
                 writer.write_all(row.as_bytes())?;
                 writer.write_all(b"\n")?;
             }

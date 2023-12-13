@@ -408,7 +408,7 @@ impl Editor {
     fn draw_welcome_message(&self) {
         let info_message = format!("{EDITOR_NAME} editor --version {VERSION}");
         let welcome_messages = [info_message.as_str(), "Welcome to the club!"];
-        for message in welcome_messages.iter() {
+        for message in &welcome_messages {
             self.draw_message_row(message);
         }
     }
