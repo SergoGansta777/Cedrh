@@ -90,7 +90,7 @@ impl FileType {
     }
 
     fn get_rust_filetype() -> FileType {
-        return FileType {
+        FileType {
             name: String::from("Rust"),
             hl_opts: HighlightingOptions {
                 numbers: true,
@@ -238,7 +238,7 @@ impl FileType {
                     "#".to_owned(),
                 ],
             },
-        };
+        }
     }
 
     fn get_cpp_filetype() -> FileType {
@@ -374,7 +374,7 @@ impl FileType {
                 .iter()
                 .map(|s| s.to_string())
                 .collect(),
-                brackets: vec!["{", "}", "(", ")", "[", "]"]
+                brackets: ["{", "}", "(", ")", "[", "]"]
                     .iter()
                     .map(|s| s.to_string())
                     .collect(),
@@ -400,7 +400,7 @@ impl FileType {
                 .iter()
                 .map(|s| s.to_string())
                 .collect(),
-                secondary_keywords: vec![
+                secondary_keywords: [
                     "print", "len", "range", "int", "float", "str", "input", "open", "file", "os",
                     "sys",
                 ]
@@ -414,7 +414,7 @@ impl FileType {
                 .iter()
                 .map(|s| s.to_string())
                 .collect(),
-                brackets: vec!["(", ")", "[", "]", "{", "}"]
+                brackets: ["(", ")", "[", "]", "{", "}"]
                     .iter()
                     .map(|s| s.to_string())
                     .collect(),
@@ -538,7 +538,7 @@ impl FileType {
                 .iter()
                 .map(|s| s.to_string())
                 .collect(),
-                brackets: vec!["{", "}", "(", ")", "[", "]"]
+                brackets: ["{", "}", "(", ")", "[", "]"]
                     .iter()
                     .map(|s| s.to_string())
                     .collect(),

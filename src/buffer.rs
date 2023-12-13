@@ -1,7 +1,6 @@
-use std::fs;
 use std::fs::File;
-use std::io::{self, BufRead, BufReader};
-use std::io::{Error, Write};
+use std::io::{self, BufRead, BufReader, BufWriter, Error, Write};
+use std::usize;
 
 use crate::FileType;
 use crate::Position;
@@ -115,13 +114,16 @@ impl Buffer {
 
     pub fn save(&mut self) -> Result<(), Error> {
         if let Some(file_name) = &self.file_name {
-            let mut file = fs::File::create(file_name)?;
-            self.file_type = FileType::from(file_name);
-            for row in &mut self.rows {
-                file.write_all(row.as_bytes())?;
-                file.write_all(b"\n")?;
+            let file = File::create(file_name)?;
+            let mut writer = BufWriter::new(file);
+
+            for row in self.rows.iter() {
+                writer.write_all(row.as_bytes())?;
+                writer.write_all(b"\n")?;
             }
+
             self.modificated = false;
+            writer.flush()?;
         }
         Ok(())
     }
@@ -131,12 +133,10 @@ impl Buffer {
         self.modificated
     }
 
+    //TODO: refactor this
     #[allow(clippy::indexing_slicing)]
     #[must_use]
     pub fn find(&self, query: &str, at: &Position, direction: SearchDirection) -> Option<Position> {
-        if at.y >= self.rows.len() {
-            return None;
-        }
         let mut position = Position { x: at.x, y: at.y };
 
         let start = if direction == SearchDirection::Forward {

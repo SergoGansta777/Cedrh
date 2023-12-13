@@ -177,7 +177,7 @@ impl Editor {
     fn draw_message_bar(&self) {
         Terminal::clear_current_line();
         let message = &self.status_message;
-        if message.time.elapsed() < Duration::new(5, 0) {
+        if message.time.elapsed() < Duration::new(15, 0) {
             let mut text = message.text.clone();
             text.truncate(self.terminal.size().width as usize);
             print!("{text}");
@@ -326,12 +326,12 @@ impl Editor {
         let width = self.terminal.size().width as usize;
         let height = self.terminal.size().height as usize;
         let offset = &mut self.offset;
+
         if y < offset.y {
             offset.y = y;
         } else if y >= offset.y.saturating_add(height) {
             offset.y = y.saturating_sub(height).saturating_add(1);
         }
-
         if x < offset.x {
             offset.x = x;
         } else if x >= offset.x.saturating_add(width) {
@@ -407,8 +407,8 @@ impl Editor {
 
     fn draw_welcome_message(&self) {
         let info_message = format!("{EDITOR_NAME} editor --version {VERSION}");
-        let welcome_messages = vec![info_message.as_str(), "Welcome to the club!"];
-        for message in welcome_messages {
+        let welcome_messages = [info_message.as_str(), "Welcome to the club!"];
+        for message in welcome_messages.iter() {
             self.draw_message_row(message);
         }
     }
@@ -416,14 +416,15 @@ impl Editor {
     fn draw_message_row(&self, message: &str) {
         let width = self.terminal.size().width as usize;
         let len = message.len();
+
         #[allow(clippy::arithmetic_side_effects, clippy::integer_division)]
         let padding = width.saturating_sub(len) / 2;
         let spaces = " ".repeat(padding.saturating_sub(1));
 
-        let mut welcome_message = format!("~{spaces}{message}");
-        welcome_message.truncate(width);
+        let welcome_message = format!("~{spaces}{message}");
+        let truncated_message = welcome_message.chars().take(width).collect::<String>();
 
-        println!("{welcome_message}\r");
+        println!("{truncated_message}\r");
     }
 
     pub fn draw_row(&self, row: &Row) {
@@ -439,15 +440,16 @@ impl Editor {
         let height = self.terminal.size().height;
         for terminal_row in 0..height {
             Terminal::clear_current_line();
-            if let Some(row) = self
+
+            match self
                 .buffer
                 .row(self.offset.y.saturating_add(terminal_row as usize))
             {
-                self.draw_row(row);
-            } else if self.buffer.is_empty() && terminal_row == height / 3 {
-                self.draw_welcome_message();
-            } else {
-                println!("~\r");
+                Some(row) => self.draw_row(row),
+                None if self.buffer.is_empty() && terminal_row == height / 3 => {
+                    self.draw_welcome_message();
+                }
+                None => println!("~\r"),
             }
         }
     }
