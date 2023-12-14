@@ -2,41 +2,176 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Result};
 
-use termion::color::Rgb;
+use crossterm::style::Color;
 
 #[must_use]
-pub fn get_colors(term: &str) -> HashMap<String, Rgb> {
+pub fn get_colors(term: &str) -> HashMap<String, Color> {
     match term {
         "xterm-kitty" | "ansi" => {
             parse_kitty_config("/Users/sergejnehorosev/.config/kitty/current-theme.conf").unwrap()
         }
-        _ => {
-            let mut colors = HashMap::new();
-            colors.insert("active_border_color".to_owned(), Rgb(0, 0, 0));
-            colors.insert("foreground".to_owned(), Rgb(63, 63, 63));
-            colors.insert("background".to_owned(), Rgb(253, 253, 253));
-            colors.insert("color0".to_owned(), Rgb(220, 163, 163));
-            colors.insert("color1".to_owned(), Rgb(38, 139, 210));
-            colors.insert("color2".to_owned(), Rgb(41, 174, 26));
-            colors.insert("color3".to_owned(), Rgb(108, 113, 196));
-            colors.insert("color4".to_owned(), Rgb(181, 137, 0));
-            colors.insert("color5".to_owned(), Rgb(42, 161, 152));
-            colors.insert("color6".to_owned(), Rgb(133, 153, 0));
-            colors.insert("color7".to_owned(), Rgb(255, 255, 255));
-            colors.insert("color8".to_owned(), Rgb(85, 85, 85));
-            colors.insert("color9".to_owned(), Rgb(220, 163, 163));
-            colors.insert("color10".to_owned(), Rgb(38, 139, 210));
-            colors.insert("color11".to_owned(), Rgb(41, 174, 26));
-            colors.insert("color12".to_owned(), Rgb(108, 113, 196));
-            colors.insert("color13".to_owned(), Rgb(181, 137, 0));
-            colors.insert("color14".to_owned(), Rgb(42, 161, 152));
-            colors.insert("color15".to_owned(), Rgb(133, 153, 0));
-            colors
-        }
+        _ => get_default_colors().unwrap(),
     }
 }
 
-fn parse_kitty_config(file_path: &str) -> Result<HashMap<String, Rgb>> {
+fn get_default_colors() -> Result<HashMap<String, Color>> {
+    let mut colors = HashMap::new();
+    colors.insert(
+        "active_border_color".to_owned(),
+        Color::Rgb { r: 0, g: 0, b: 0 },
+    );
+    colors.insert(
+        "active_border_color".to_owned(),
+        Color::Rgb { r: 0, g: 0, b: 0 },
+    );
+    colors.insert(
+        "foreground".to_owned(),
+        Color::Rgb {
+            r: 63,
+            g: 63,
+            b: 63,
+        },
+    );
+    colors.insert(
+        "background".to_owned(),
+        Color::Rgb {
+            r: 253,
+            g: 253,
+            b: 253,
+        },
+    );
+    colors.insert(
+        "color0".to_owned(),
+        Color::Rgb {
+            r: 220,
+            g: 163,
+            b: 163,
+        },
+    );
+    colors.insert(
+        "color1".to_owned(),
+        Color::Rgb {
+            r: 38,
+            g: 139,
+            b: 210,
+        },
+    );
+    colors.insert(
+        "color2".to_owned(),
+        Color::Rgb {
+            r: 41,
+            g: 174,
+            b: 26,
+        },
+    );
+    colors.insert(
+        "color3".to_owned(),
+        Color::Rgb {
+            r: 108,
+            g: 113,
+            b: 196,
+        },
+    );
+    colors.insert(
+        "color4".to_owned(),
+        Color::Rgb {
+            r: 181,
+            g: 137,
+            b: 0,
+        },
+    );
+    colors.insert(
+        "color5".to_owned(),
+        Color::Rgb {
+            r: 42,
+            g: 161,
+            b: 152,
+        },
+    );
+    colors.insert(
+        "color6".to_owned(),
+        Color::Rgb {
+            r: 133,
+            g: 153,
+            b: 0,
+        },
+    );
+    colors.insert(
+        "color7".to_owned(),
+        Color::Rgb {
+            r: 255,
+            g: 255,
+            b: 255,
+        },
+    );
+    colors.insert(
+        "color8".to_owned(),
+        Color::Rgb {
+            r: 85,
+            g: 85,
+            b: 85,
+        },
+    );
+    colors.insert(
+        "color9".to_owned(),
+        Color::Rgb {
+            r: 220,
+            g: 163,
+            b: 163,
+        },
+    );
+    colors.insert(
+        "color10".to_owned(),
+        Color::Rgb {
+            r: 38,
+            g: 139,
+            b: 210,
+        },
+    );
+    colors.insert(
+        "color11".to_owned(),
+        Color::Rgb {
+            r: 41,
+            g: 174,
+            b: 26,
+        },
+    );
+    colors.insert(
+        "color12".to_owned(),
+        Color::Rgb {
+            r: 108,
+            g: 113,
+            b: 196,
+        },
+    );
+    colors.insert(
+        "color13".to_owned(),
+        Color::Rgb {
+            r: 181,
+            g: 137,
+            b: 0,
+        },
+    );
+    colors.insert(
+        "color14".to_owned(),
+        Color::Rgb {
+            r: 42,
+            g: 161,
+            b: 152,
+        },
+    );
+    colors.insert(
+        "color15".to_owned(),
+        Color::Rgb {
+            r: 133,
+            g: 153,
+            b: 0,
+        },
+    );
+    Ok(colors)
+}
+
+fn parse_kitty_config(file_path: &str) -> Result<HashMap<String, Color>> {
     let file = File::open(file_path)?;
     let reader = BufReader::new(file);
 
@@ -62,12 +197,16 @@ fn parse_kitty_config(file_path: &str) -> Result<HashMap<String, Rgb>> {
     Ok(colors)
 }
 
-fn parse_hex_to_rgb(hex_code: &str) -> Rgb {
+fn parse_hex_to_rgb(hex_code: &str) -> Color {
     let red = u8::from_str_radix(&hex_code[1..3], 16)
         .unwrap_or_else(|_| panic!("Invalid red hex code: {hex_code}"));
     let green = u8::from_str_radix(&hex_code[3..5], 16)
         .unwrap_or_else(|_| panic!("Invalid green hex code: {hex_code}"));
     let blue = u8::from_str_radix(&hex_code[5..7], 16)
         .unwrap_or_else(|_| panic!("Invalid blue hex code: {hex_code}"));
-    Rgb(red, green, blue)
+    Color::Rgb {
+        r: red,
+        g: green,
+        b: blue,
+    }
 }

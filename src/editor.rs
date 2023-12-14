@@ -3,8 +3,10 @@ use std::env;
 use std::time::Duration;
 use std::time::Instant;
 
-use termion::color;
-use termion::event::Key;
+use crossterm::{
+    event::{read, Event, KeyCode, KeyEvent, KeyModifiers},
+    style::{Color, Colors},
+};
 use unicode_segmentation::UnicodeSegmentation;
 
 use crate::colortheme::get_colors;
@@ -51,7 +53,7 @@ pub struct Editor {
     status_message: StatusMessage,
     quit_times: u8,
     highlighted_word: Option<String>,
-    colors: HashMap<String, color::Rgb>,
+    colors: HashMap<String, Color>,
 }
 
 impl Editor {
@@ -61,6 +63,7 @@ impl Editor {
 
         let mut initial_status =
             String::from("HELP: Ctrl-q = quit | Ctrl-s = save | Ctrl-f = find");
+
         let buffer = if let Some(file_name) = args.get(1) {
             let buf = Buffer::open(file_name);
             if let Ok(buf) = buf {
@@ -96,7 +99,7 @@ impl Editor {
                 break;
             }
 
-            if let Err(error) = self.process_keypress() {
+            if let Err(error) = self.process_event() {
                 die(&error);
             }
         }
@@ -104,10 +107,10 @@ impl Editor {
 
     fn refresh_screen(&mut self) -> Result<(), std::io::Error> {
         Terminal::cursor_hide();
-        Terminal::change_cursor();
         Terminal::cursor_position(&Position::default());
+
         if self.should_quit {
-            Terminal::clear_screen();
+            Terminal::quit();
             println!("Goodbye!\r");
         } else {
             self.buffer.highlight(
@@ -121,6 +124,7 @@ impl Editor {
             self.draw_rows();
             self.draw_status_bar();
             self.draw_message_bar();
+
             Terminal::cursor_position(&Position {
                 x: self.cursor_position.x.saturating_sub(self.offset.x),
                 y: self.cursor_position.y.saturating_sub(self.offset.y),
@@ -186,34 +190,37 @@ impl Editor {
 
     fn prompt<C>(&mut self, prompt: &str, mut callback: C) -> Result<Option<String>, std::io::Error>
     where
-        C: FnMut(&mut Self, Key, &String),
+        C: FnMut(&mut Self, KeyEvent, &String),
     {
         let mut result = String::new();
         loop {
             self.status_message = StatusMessage::from(format!("{prompt}{result}"));
             self.refresh_screen()?;
-            let key = Terminal::read_key()?;
-            match key {
-                Key::Backspace => {
-                    let graphemes_count = result.graphemes(true).count();
-                    result = result
-                        .graphemes(true)
-                        .take(graphemes_count.saturating_sub(1))
-                        .collect();
-                }
-                Key::Char('\n') => break,
-                Key::Char(c) => {
-                    if !c.is_control() {
-                        result.push(c);
+
+            let event = read()?;
+            if let Event::Key(key) = event {
+                match key.code {
+                    KeyCode::Backspace => {
+                        let graphemes_count = result.graphemes(true).count();
+                        result = result
+                            .graphemes(true)
+                            .take(graphemes_count.saturating_sub(1))
+                            .collect();
                     }
+                    KeyCode::Char('\n') => break,
+                    KeyCode::Char(c) => {
+                        if !c.is_control() {
+                            result.push(c);
+                        }
+                    }
+                    KeyCode::Esc => {
+                        result.truncate(0);
+                        break;
+                    }
+                    _ => (),
                 }
-                Key::Esc => {
-                    result.truncate(0);
-                    break;
-                }
-                _ => (),
+                callback(self, key, &result);
             }
-            callback(self, key, &result);
         }
         self.status_message = StatusMessage::from(String::new());
         if result.is_empty() {
@@ -247,12 +254,13 @@ impl Editor {
                 "Search (ESC to cancel, Arrows to navigate): ",
                 |editor, key, query| {
                     let mut moved = false;
-                    match key {
-                        Key::Right | Key::Down => {
-                            editor.move_cursor(Key::Right);
+                    match key.code {
+                        KeyCode::Right | KeyCode::Down => {
+                            direction = SearchDirection::Forward;
+                            editor.move_cursor(KeyCode::Right);
                             moved = true;
                         }
-                        Key::Left | Key::Up => direction = SearchDirection::Backward,
+                        KeyCode::Left | KeyCode::Up => direction = SearchDirection::Backward,
                         _ => direction = SearchDirection::Forward,
                     }
                     if let Some(position) =
@@ -263,7 +271,7 @@ impl Editor {
                         editor.cursor_position = position;
                         editor.scroll();
                     } else if moved {
-                        editor.move_cursor(Key::Left);
+                        editor.move_cursor(KeyCode::Left);
                     }
                     editor.highlighted_word = Some(query.to_string());
                 },
@@ -276,10 +284,24 @@ impl Editor {
         self.highlighted_word = None;
     }
 
-    fn process_keypress(&mut self) -> Result<(), std::io::Error> {
-        let pressed_key = Terminal::read_key()?;
-        match pressed_key {
-            Key::Ctrl('q') => {
+    fn process_event(&mut self) -> Result<(), std::io::Error> {
+        let event = Terminal::read()?;
+
+        match event {
+            Event::Key(pressed_key) => self.process_keypress(pressed_key),
+            Event::Resize(width, height) => {
+                self.terminal.size.width = width;
+                self.terminal.size.height =
+                    height - if env::consts::OS == "windows" { 1 } else { 2 };
+                Ok(())
+            }
+            _ => Ok(()),
+        }
+    }
+
+    fn process_keypress(&mut self, pressed_key: KeyEvent) -> Result<(), std::io::Error> {
+        match (pressed_key.modifiers, pressed_key.code) {
+            (KeyModifiers::CONTROL, KeyCode::Char('q')) => {
                 if self.quit_times > 0 && self.buffer.is_modificated() {
                     self.status_message = StatusMessage::from(format!(
                         "WARNING! file has unsaved changes. Press Ctrl_q {} more times to quit",
@@ -290,27 +312,27 @@ impl Editor {
                 }
                 self.should_quit = true;
             }
-            Key::Ctrl('s') => self.save(),
-            Key::Ctrl('f') => self.search(),
-            Key::Char(c) => {
+            (KeyModifiers::CONTROL, KeyCode::Char('s')) => self.save(),
+            (KeyModifiers::CONTROL, KeyCode::Char('f')) => self.search(),
+            (_, KeyCode::Char(mut c)) => {
                 self.buffer.insert(&self.cursor_position, c);
-                self.move_cursor(Key::Right);
+                self.move_cursor(KeyCode::Right);
             }
-            Key::Delete => self.buffer.delete(&self.cursor_position),
-            Key::Backspace => {
+            (_, KeyCode::Delete) => self.buffer.delete(&self.cursor_position),
+            (_, KeyCode::Backspace) => {
                 if self.cursor_position.x > 0 || self.cursor_position.y > 0 {
-                    self.move_cursor(Key::Left);
+                    self.move_cursor(KeyCode::Left);
                     self.buffer.delete(&self.cursor_position);
                 }
             }
-            Key::Up
-            | Key::Down
-            | Key::Left
-            | Key::Right
-            | Key::PageUp
-            | Key::PageDown
-            | Key::End
-            | Key::Home => self.move_cursor(pressed_key),
+            (_, KeyCode::Up)
+            | (_, KeyCode::Down)
+            | (_, KeyCode::Left)
+            | (_, KeyCode::Right)
+            | (_, KeyCode::PageUp)
+            | (_, KeyCode::PageDown)
+            | (_, KeyCode::End)
+            | (_, KeyCode::Home) => self.move_cursor(pressed_key.code),
             _ => (),
         }
         self.scroll();
@@ -318,6 +340,7 @@ impl Editor {
             self.quit_times = QUIT_TIMES;
             self.status_message = StatusMessage::from(String::new());
         }
+
         Ok(())
     }
 
@@ -325,7 +348,7 @@ impl Editor {
         let Position { x, y } = self.cursor_position;
         let width = self.terminal.size().width as usize;
         let height = self.terminal.size().height as usize;
-        let offset = &mut self.offset;
+        let mut offset = &mut self.offset;
 
         if y < offset.y {
             offset.y = y;
@@ -339,7 +362,7 @@ impl Editor {
         }
     }
 
-    fn move_cursor(&mut self, key: Key) {
+    fn move_cursor(&mut self, key: KeyCode) {
         let terminal_height = self.terminal.size().height as usize;
         let Position { mut y, mut x } = self.cursor_position;
         let height = self.buffer.len();
@@ -348,14 +371,15 @@ impl Editor {
         } else {
             0
         };
+
         match key {
-            Key::Up => y = y.saturating_sub(1),
-            Key::Down => {
+            KeyCode::Up => y = y.saturating_sub(1),
+            KeyCode::Down => {
                 if y < height {
                     y = y.saturating_add(1);
                 }
             }
-            Key::Left => {
+            KeyCode::Left => {
                 if x > 0 {
                     x -= 1;
                 } else if y > 0 {
@@ -367,7 +391,7 @@ impl Editor {
                     }
                 }
             }
-            Key::Right => {
+            KeyCode::Right => {
                 if x < width {
                     x += 1;
                 } else if y < height {
@@ -375,22 +399,22 @@ impl Editor {
                     x = 0;
                 }
             }
-            Key::PageUp => {
+            KeyCode::PageUp => {
                 y = if y > terminal_height {
                     y.saturating_sub(terminal_height)
                 } else {
                     0
                 }
             }
-            Key::PageDown => {
+            KeyCode::PageDown => {
                 y = if y.saturating_add(terminal_height) < height {
                     y.saturating_add(terminal_height)
                 } else {
                     height
                 }
             }
-            Key::Home => x = 0,
-            Key::End => x = width,
+            KeyCode::Home => x = 0,
+            KeyCode::End => x = width,
             _ => (),
         }
         width = if let Some(row) = self.buffer.row(y) {
@@ -409,11 +433,11 @@ impl Editor {
         let info_message = format!("{EDITOR_NAME} editor --version {VERSION}");
         let welcome_messages = [info_message.as_str(), "Welcome to the club!"];
         for message in &welcome_messages {
-            self.draw_message_row(message);
+            self.draw_centered_message(message);
         }
     }
 
-    fn draw_message_row(&self, message: &str) {
+    fn draw_centered_message(&self, message: &str) {
         let width = self.terminal.size().width as usize;
         let len = message.len();
 

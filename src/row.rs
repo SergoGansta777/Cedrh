@@ -1,9 +1,8 @@
 use std::borrow::Cow;
 use std::cmp;
 use std::collections::HashMap;
-use std::fmt::Write;
 
-use termion::color;
+use crossterm::{style::Color, style::SetForegroundColor};
 use unicode_segmentation::UnicodeSegmentation;
 
 use crate::highlighting;
@@ -31,7 +30,7 @@ impl From<&str> for Row {
 
 impl Row {
     #[must_use]
-    pub fn render(&self, colors: &HashMap<String, color::Rgb>, start: usize, end: usize) -> String {
+    pub fn render(&self, colors: &HashMap<String, Color>, start: usize, end: usize) -> String {
         let end = cmp::min(end, self.string.len());
         let start = cmp::min(start, end);
         let mut result = String::with_capacity(end - start);
@@ -51,12 +50,9 @@ impl Row {
 
             if highlighting_type != &*current_highlighting {
                 current_highlighting = Cow::Borrowed(highlighting_type);
-                write!(
-                    result,
-                    "{}",
-                    termion::color::Fg(highlighting_type.to_color(colors))
+                result.push_str(
+                    format!("{}", SetForegroundColor(highlighting_type.to_color(colors))).as_str(),
                 )
-                .unwrap();
             }
 
             if grapheme == "\t" {
@@ -66,7 +62,7 @@ impl Row {
             }
         }
 
-        write!(result, "{}", termion::color::Fg(color::Reset)).unwrap();
+        result.push_str(format!("{}", SetForegroundColor(Color::Reset)).as_str());
         result
     }
 

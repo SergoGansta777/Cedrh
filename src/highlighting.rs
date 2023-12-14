@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use termion::color;
+use crossterm::style::Color;
 
 #[derive(PartialEq, Clone, Copy, Debug)]
 pub enum Type {
@@ -18,7 +18,7 @@ pub enum Type {
 }
 
 impl Type {
-    pub fn to_color(self, colors: &HashMap<String, color::Rgb>) -> impl color::Color {
+    pub fn to_color(self, colors: &HashMap<String, Color>) -> Color {
         match self {
             Type::Number => colors["color6"],
             Type::Match => colors["color0"],
