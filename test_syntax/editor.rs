@@ -4,7 +4,7 @@ use std::time::Duration;
 use std::time::Instant;
 
 use crossterm::{
-    event::{Event, KeyCode, KeyEvent, KeyModifiers},
+    event::{read, Event, KeyCode, KeyEvent, KeyModifiers},
     style::Color,
 };
 use unicode_segmentation::UnicodeSegmentation;
@@ -15,8 +15,8 @@ use crate::Row;
 use crate::Terminal;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
-const EDITOR_NAME: &str = "Cedrh";
-const ADDITIONAL_QUIT_TIMES: u8 = 1;
+const EDITOR_NAME: &str = "Sedrh";
+const QUIT_TIMES: u8 = 1;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum SearchDirection {
@@ -83,7 +83,7 @@ impl Editor {
             cursor_position: Position::default(),
             offset: Position::default(),
             status_message: StatusMessage::from(initial_status),
-            quit_times: ADDITIONAL_QUIT_TIMES,
+            quit_times: QUIT_TIMES,
             highlighted_word: None,
             colors: get_colors(&term),
         }
@@ -340,8 +340,8 @@ impl Editor {
             _ => (),
         }
         self.scroll();
-        if self.quit_times < ADDITIONAL_QUIT_TIMES {
-            self.quit_times = ADDITIONAL_QUIT_TIMES;
+        if self.quit_times < QUIT_TIMES {
+            self.quit_times = QUIT_TIMES;
             self.status_message = StatusMessage::from(String::new());
         }
 
