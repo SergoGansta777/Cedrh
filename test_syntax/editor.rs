@@ -4,7 +4,7 @@ use std::time::Duration;
 use std::time::Instant;
 
 use crossterm::{
-    event::{Event, KeyCode, KeyEvent, KeyModifiers},
+    event::{read, Event, KeyCode, KeyEvent, KeyModifiers},
     style::Color,
 };
 use unicode_segmentation::UnicodeSegmentation;
