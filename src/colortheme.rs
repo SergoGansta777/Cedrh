@@ -1,15 +1,16 @@
+use shellexpand::tilde;
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader, Result};
+use std::path::PathBuf;
 
 use crossterm::style::Color;
 
 #[must_use]
 pub fn get_colors(term: &str) -> HashMap<String, Color> {
     match term {
-        "xterm-kitty" | "ansi" => {
-            parse_kitty_config("/Users/sergejnehorosev/.config/kitty/current-theme.conf").unwrap()
-        }
+        "xterm-kitty" | "ansi" => parse_kitty_config("~/.config/kitty/current-theme.conf")
+            .unwrap_or(get_default_colors().unwrap()),
         _ => get_default_colors().unwrap(),
     }
 }
@@ -171,8 +172,10 @@ fn get_default_colors() -> Result<HashMap<String, Color>> {
     Ok(colors)
 }
 
-fn parse_kitty_config(file_path: &str) -> Result<HashMap<String, Color>> {
-    let file = File::open(file_path)?;
+fn parse_kitty_config(config_path: &str) -> Result<HashMap<String, Color>> {
+    let expanded_path = tilde(config_path);
+    let path = PathBuf::from(expanded_path.into_owned());
+    let file = File::open(path)?;
     let reader = BufReader::new(file);
 
     let mut colors = HashMap::new();

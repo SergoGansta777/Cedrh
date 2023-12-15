@@ -12,4 +12,5 @@ categories = ["text-editors", "development-tools"]
 [dependencies]
 clap = { version = "4.4.11", features = ["derive"] }
 crossterm = "0.27.0"
+shellexpand = "3.1.0"
 unicode-segmentation = "1.10.1"
