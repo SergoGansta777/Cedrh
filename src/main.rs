@@ -13,7 +13,9 @@
     clippy::struct_excessive_bools
 )]
 
+pub use args::AppArgs;
 pub use buffer::Buffer;
+use clap::Parser;
 pub use editor::Position;
 pub use editor::SearchDirection;
 pub use filetype::FileType;
@@ -23,6 +25,7 @@ pub use terminal::Terminal;
 
 use editor::Editor;
 
+mod args;
 mod buffer;
 mod colortheme;
 mod editor;
@@ -32,5 +35,6 @@ mod row;
 mod terminal;
 
 fn main() {
-    Editor::new().run();
+    let args = AppArgs::parse();
+    Editor::new(&args).run();
 }
