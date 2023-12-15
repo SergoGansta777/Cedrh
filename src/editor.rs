@@ -10,12 +10,13 @@ use crossterm::{
 use unicode_segmentation::UnicodeSegmentation;
 
 use crate::colortheme::get_colors;
+use crate::AppArgs;
 use crate::Buffer;
 use crate::Row;
 use crate::Terminal;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
-const EDITOR_NAME: &str = "Cedrh";
+const EDITOR_NAME: &str = env!("CARGO_PKG_NAME");
 const ADDITIONAL_QUIT_TIMES: u8 = 1;
 
 #[derive(PartialEq, Copy, Clone)]
@@ -57,14 +58,13 @@ pub struct Editor {
 }
 
 impl Editor {
-    pub fn new() -> Self {
-        let args: Vec<String> = env::args().collect();
+    pub fn new(args: &AppArgs) -> Self {
         let term = env::var("TERM").unwrap_or_default();
 
         let mut initial_status =
             String::from("HELP: Ctrl-q = quit | Ctrl-s = save | Ctrl-f = find");
 
-        let buffer = if let Some(file_name) = args.get(1) {
+        let buffer = if let Some(file_name) = args.file.as_deref() {
             let buf = Buffer::open(file_name);
             if let Ok(buf) = buf {
                 buf
@@ -181,7 +181,7 @@ impl Editor {
     fn draw_message_bar(&self) {
         Terminal::clear_current_line();
         let message = &self.status_message;
-        if message.time.elapsed() < Duration::new(15, 0) {
+        if message.time.elapsed() < Duration::new(45, 0) {
             let mut text = message.text.clone();
             text.truncate(self.terminal.size().width as usize);
             print!("{text}");

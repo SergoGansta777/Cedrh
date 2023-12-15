@@ -2,9 +2,14 @@
 name = "cedrh"
 version = "0.3.1"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["Sergey Nechoroshev <sergo777ser777@gmail.com>"]
+description = """
+cedrh - simple console text-editor with syntax highighting written in Rust
+"""
+keywords = ["text-editor", "editor", "terminal", "utf-8", "Rust"]
+categories = ["text-editors", "development-tools"]
 
 [dependencies]
+clap = { version = "4.4.11", features = ["derive"] }
 crossterm = "0.27.0"
 unicode-segmentation = "1.10.1"
