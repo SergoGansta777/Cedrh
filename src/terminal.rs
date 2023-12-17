@@ -6,20 +6,22 @@ use crossterm::{
     style::{Color, ResetColor, SetBackgroundColor, SetForegroundColor},
     terminal, ExecutableCommand, QueueableCommand,
 };
-use std::io::{self, stdout, Write};
+use std::io::{self, stdout, Error, Write};
 
 pub struct Size {
     pub width: u16,
     pub height: u16,
 }
 
+#[non_exhaustive]
 pub struct Terminal {
     pub size: Size,
 }
 
 impl Terminal {
-    pub fn new() -> Result<Self, std::io::Error> {
-        let size = terminal::size().unwrap();
+    #[allow(clippy::unnecessary_wraps)]
+    pub fn new() -> Result<Self, Error> {
+        let size = terminal::size().unwrap_or((40, 40));
         terminal::enable_raw_mode().ok();
 
         Ok(Self {
@@ -46,25 +48,27 @@ impl Terminal {
         stdout()
             .execute(terminal::Clear(terminal::ClearType::All))
             .ok();
-        crossterm::terminal::disable_raw_mode().ok();
+        terminal::disable_raw_mode().ok();
     }
 
-    #[allow(clippy::cast_possible_truncation)]
+    #[allow(clippy::cast_possible_truncation, clippy::as_conversions)]
     pub fn cursor_position(position: &Position) {
-        let Position { mut x, mut y } = position;
+        let Position { mut x, mut y } = *position;
         x = x.saturating_add(1);
         y = y.saturating_add(1);
         let x = x as u16;
         let y = y as u16;
 
-        stdout().queue(cursor::MoveTo(x - 1, y - 1)).ok();
+        stdout()
+            .queue(cursor::MoveTo(x.saturating_sub(1), y.saturating_sub(1)))
+            .ok();
     }
 
-    pub fn flush() -> Result<(), std::io::Error> {
+    pub fn flush() -> Result<(), Error> {
         io::stdout().flush()
     }
 
-    pub fn read() -> Result<Event, std::io::Error> {
+    pub fn read() -> Result<Event, Error> {
         read()
     }
 
@@ -76,6 +80,7 @@ impl Terminal {
         stdout().execute(cursor::EnableBlinking).ok();
     }
 
+    #[allow(dead_code)]
     pub fn change_cursor() {
         stdout().execute(cursor::SetCursorStyle::BlinkingBar).ok();
     }

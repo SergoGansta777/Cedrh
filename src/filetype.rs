@@ -3,6 +3,7 @@ pub struct FileType {
     hl_opts: HighlightingOptions,
 }
 
+#[allow(clippy::struct_excessive_bools)]
 #[derive(Default)]
 pub struct HighlightingOptions {
     numbers: bool,
@@ -89,6 +90,7 @@ impl FileType {
         }
     }
 
+    #[allow(clippy::too_many_lines)]
     fn get_rust_filetype() -> FileType {
         FileType {
             name: String::from("Rust"),
@@ -241,6 +243,7 @@ impl FileType {
         }
     }
 
+    #[allow(clippy::too_many_lines)]
     fn get_cpp_filetype() -> FileType {
         FileType {
             name: String::from("C++"),
@@ -337,7 +340,7 @@ impl FileType {
                     "struct",
                 ]
                 .iter()
-                .map(|s| (*s).to_string())
+                .map(|st| (*st).to_owned())
                 .collect(),
                 secondary_keywords: vec![
                     "bool",
@@ -364,7 +367,7 @@ impl FileType {
                     "priority_queue",
                 ]
                 .iter()
-                .map(|s| (*s).to_string())
+                .map(|st| (*st).to_owned())
                 .collect(),
                 operators: vec![
                     "+", "-", "*", "/", "%", "^", "&", "|", "~", "!", "=", "<", ">", "+=", "-=",
@@ -372,11 +375,11 @@ impl FileType {
                     ">=", "&&", "||", "++", "--", ",", "->*", "->", ";", ":", "?", "::",
                 ]
                 .iter()
-                .map(|s| (*s).to_string())
+                .map(|st| (*st).to_owned())
                 .collect(),
                 brackets: ["{", "}", "(", ")", "[", "]"]
                     .iter()
-                    .map(|s| (*s).to_string())
+                    .map(|st| (*st).to_owned())
                     .collect(),
             },
         }
@@ -398,30 +401,31 @@ impl FileType {
                     "or", "pass", "raise", "return", "try", "while", "with", "yield",
                 ]
                 .iter()
-                .map(|s| (*s).to_string())
+                .map(|st| (*st).to_owned())
                 .collect(),
                 secondary_keywords: [
                     "print", "len", "range", "int", "float", "str", "input", "open", "file", "os",
                     "sys",
                 ]
                 .iter()
-                .map(|s| (*s).to_string())
+                .map(|st| (*st).to_owned())
                 .collect(),
                 operators: vec![
                     "+", "-", "*", "**", "/", "//", "%", "@", "<<", ">>", "&", "|", "^", "~", "<",
                     ">", "<=", ">=", "==", "!=",
                 ]
                 .iter()
-                .map(|s| (*s).to_string())
+                .map(|st| (*st).to_owned())
                 .collect(),
                 brackets: ["(", ")", "[", "]", "{", "}"]
                     .iter()
-                    .map(|s| (*s).to_string())
+                    .map(|st| (*st).to_owned())
                     .collect(),
             },
         }
     }
 
+    #[allow(clippy::too_many_lines)]
     fn get_csharp_filetype() -> FileType {
         FileType {
             name: String::from("C#"),
@@ -504,7 +508,7 @@ impl FileType {
                     "while",
                 ]
                 .iter()
-                .map(|s| (*s).to_string())
+                .map(|st| (*st).to_owned())
                 .collect(),
                 secondary_keywords: vec![
                     "Console",
@@ -528,7 +532,7 @@ impl FileType {
                     "Tasks",
                 ]
                 .iter()
-                .map(|s| (*s).to_string())
+                .map(|st| (*st).to_owned())
                 .collect(),
                 operators: vec![
                     "+", "-", "*", "/", "%", "&", "|", "^", "!", "~", "&&", "||", "++", "--", "==",
@@ -536,11 +540,11 @@ impl FileType {
                     "&=", "|=", "^=", "<<=", ">>=", "??", "?", ":", "::", ";", ".", ",",
                 ]
                 .iter()
-                .map(|s| (*s).to_string())
+                .map(|st| (*st).to_owned())
                 .collect(),
                 brackets: ["{", "}", "(", ")", "[", "]"]
                     .iter()
-                    .map(|s| (*s).to_string())
+                    .map(|st| (*st).to_owned())
                     .collect(),
             },
         }

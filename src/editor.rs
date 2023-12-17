@@ -1,7 +1,7 @@
+use core::time::Duration;
 use std::collections::HashMap;
-use std::env;
-use std::time::Duration;
 use std::time::Instant;
+use std::{env, io::Error};
 
 use crossterm::{
     event::{Event, KeyCode, KeyEvent, KeyModifiers},
@@ -20,12 +20,14 @@ const EDITOR_NAME: &str = env!("CARGO_PKG_NAME");
 const ADDITIONAL_QUIT_TIMES: u8 = 1;
 
 #[derive(PartialEq, Copy, Clone)]
+#[non_exhaustive]
 pub enum SearchDirection {
     Forward,
     Backward,
 }
 
 #[derive(Default, Clone)]
+#[non_exhaustive]
 pub struct Position {
     pub x: usize,
     pub y: usize,
@@ -105,7 +107,8 @@ impl Editor {
         }
     }
 
-    fn refresh_screen(&mut self) -> Result<(), std::io::Error> {
+    #[allow(clippy::as_conversions)]
+    fn refresh_screen(&mut self) -> Result<(), Error> {
         Terminal::cursor_hide();
         Terminal::cursor_position(&Position::default());
 
@@ -135,6 +138,7 @@ impl Editor {
         Terminal::flush()
     }
 
+    #[allow(clippy::as_conversions)]
     fn draw_status_bar(&self) {
         let mut status;
         let width = self.terminal.size().width as usize;
@@ -143,9 +147,9 @@ impl Editor {
         } else {
             ""
         };
-        let mut file_name = "[No Name]".to_string();
-        if let Some(name) = &self.buffer.file_name {
-            file_name = name.clone();
+        let mut file_name = "[No Name]".to_owned();
+        if let Some(name) = self.buffer.file_name() {
+            file_name = (*name).clone();
             file_name.truncate(20);
         }
 
@@ -178,6 +182,8 @@ impl Editor {
         Terminal::reset_fg_color();
         Terminal::reset_bg_color();
     }
+
+    #[allow(clippy::as_conversions)]
     fn draw_message_bar(&self) {
         Terminal::clear_current_line();
         let message = &self.status_message;
@@ -188,7 +194,7 @@ impl Editor {
         }
     }
 
-    fn prompt<C>(&mut self, prompt: &str, mut callback: C) -> Result<Option<String>, std::io::Error>
+    fn prompt<C>(&mut self, prompt: &str, mut callback: C) -> Result<Option<String>, Error>
     where
         C: FnMut(&mut Self, KeyEvent, &String),
     {
@@ -208,9 +214,9 @@ impl Editor {
                             .collect();
                     }
                     KeyCode::Enter => break,
-                    KeyCode::Char(c) => {
-                        if !c.is_control() {
-                            result.push(c);
+                    KeyCode::Char(ch) => {
+                        if !ch.is_control() {
+                            result.push(ch);
                         }
                     }
                     KeyCode::Esc => {
@@ -230,19 +236,19 @@ impl Editor {
     }
 
     fn save(&mut self) {
-        if self.buffer.file_name.is_none() {
+        if self.buffer.file_name().is_none() {
             let new_name = self.prompt("Save as ", |_, _, _| {}).unwrap_or(None);
             if new_name.is_none() {
-                self.status_message = StatusMessage::from("Save aborted.".to_string());
+                self.status_message = StatusMessage::from("Save aborted.".to_owned());
                 return;
             }
-            self.buffer.file_name = new_name;
+            self.buffer.set_file_name(new_name);
         }
 
         if self.buffer.save().is_ok() {
-            self.status_message = StatusMessage::from("File saved successfully.".to_string());
+            self.status_message = StatusMessage::from("File saved successfully.".to_owned());
         } else {
-            self.status_message = StatusMessage::from("Error writing file!".to_string());
+            self.status_message = StatusMessage::from("Error writing file!".to_owned());
         }
     }
 
@@ -273,7 +279,7 @@ impl Editor {
                     } else if moved {
                         editor.move_cursor(KeyCode::Left);
                     }
-                    editor.highlighted_word = Some(query.to_string());
+                    editor.highlighted_word = Some(query.to_owned());
                 },
             )
             .unwrap_or(None);
@@ -284,7 +290,8 @@ impl Editor {
         self.highlighted_word = None;
     }
 
-    fn process_event(&mut self) -> Result<(), std::io::Error> {
+    #[allow(clippy::arithmetic_side_effects)]
+    fn process_event(&mut self) -> Result<(), Error> {
         let event = Terminal::read()?;
 
         match event {
@@ -299,7 +306,8 @@ impl Editor {
         }
     }
 
-    fn process_keypress(&mut self, pressed_key: KeyEvent) -> Result<(), std::io::Error> {
+    #[allow(clippy::unnecessary_wraps, clippy::arithmetic_side_effects)]
+    fn process_keypress(&mut self, pressed_key: KeyEvent) -> Result<(), Error> {
         match (pressed_key.modifiers, pressed_key.code) {
             (KeyModifiers::CONTROL, KeyCode::Char('q')) => {
                 if self.quit_times > 0 && self.buffer.is_modificated() {
@@ -314,8 +322,8 @@ impl Editor {
             }
             (KeyModifiers::CONTROL, KeyCode::Char('s')) => self.save(),
             (KeyModifiers::CONTROL, KeyCode::Char('f')) => self.search(),
-            (_, KeyCode::Char(c)) => {
-                self.buffer.insert(&self.cursor_position, c);
+            (_, KeyCode::Char(ch)) => {
+                self.buffer.insert(&self.cursor_position, ch);
                 self.move_cursor(KeyCode::Right);
             }
             (_, KeyCode::Delete) => self.buffer.delete(&self.cursor_position),
@@ -329,14 +337,17 @@ impl Editor {
                 self.buffer.insert(&self.cursor_position, '\n');
                 self.move_cursor(KeyCode::Right);
             }
-            (_, KeyCode::Up)
-            | (_, KeyCode::Down)
-            | (_, KeyCode::Left)
-            | (_, KeyCode::Right)
-            | (_, KeyCode::PageUp)
-            | (_, KeyCode::PageDown)
-            | (_, KeyCode::End)
-            | (_, KeyCode::Home) => self.move_cursor(pressed_key.code),
+            (
+                _,
+                KeyCode::Up
+                | KeyCode::Down
+                | KeyCode::Left
+                | KeyCode::Right
+                | KeyCode::PageUp
+                | KeyCode::PageDown
+                | KeyCode::End
+                | KeyCode::Home,
+            ) => self.move_cursor(pressed_key.code),
             _ => (),
         }
         self.scroll();
@@ -348,6 +359,7 @@ impl Editor {
         Ok(())
     }
 
+    #[allow(clippy::as_conversions)]
     fn scroll(&mut self) {
         let Position { x, y } = self.cursor_position;
         let width = self.terminal.size().width as usize;
@@ -366,6 +378,7 @@ impl Editor {
         }
     }
 
+    #[allow(clippy::as_conversions, clippy::arithmetic_side_effects)]
     fn move_cursor(&mut self, key: KeyCode) {
         let terminal_height = self.terminal.size().height as usize;
         let Position { mut y, mut x } = self.cursor_position;
@@ -441,6 +454,7 @@ impl Editor {
         }
     }
 
+    #[allow(clippy::as_conversions)]
     fn draw_centered_message(&self, message: &str) {
         let width = self.terminal.size().width as usize;
         let len = message.len();
@@ -455,6 +469,7 @@ impl Editor {
         println!("{truncated_message}\r");
     }
 
+    #[allow(clippy::as_conversions)]
     pub fn draw_row(&self, row: &Row) {
         let width = self.terminal.size().width as usize;
         let start = self.offset.x;
@@ -463,7 +478,11 @@ impl Editor {
         println!("{row}\r");
     }
 
-    #[allow(clippy::integer_division, clippy::arithmetic_side_effects)]
+    #[allow(
+        clippy::integer_division,
+        clippy::arithmetic_side_effects,
+        clippy::as_conversions
+    )]
     fn draw_rows(&self) {
         let height = self.terminal.size().height;
         for terminal_row in 0..height {
@@ -483,7 +502,7 @@ impl Editor {
     }
 }
 
-fn die(e: &std::io::Error) {
+fn die(error: &Error) {
     Terminal::clear_screen();
-    panic!("{}", e);
+    panic!("{}", error);
 }

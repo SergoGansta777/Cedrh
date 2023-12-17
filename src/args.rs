@@ -13,6 +13,8 @@ use clap::Parser;
 
 {all-args}{after-help}
 ")]
+#[allow(clippy::module_name_repetitions)]
+#[non_exhaustive]
 pub struct AppArgs {
     /// File to edit
     pub file: Option<String>,

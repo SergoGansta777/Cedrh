@@ -1,3 +1,4 @@
+#![warn(clippy::all, clippy::pedantic)]
 #![allow(
     clippy::missing_docs_in_private_items,
     clippy::implicit_return,
@@ -5,23 +6,26 @@
     clippy::print_stdout,
     clippy::wildcard_enum_match_arm,
     clippy::else_if_without_else,
-    clippy::exhaustive_enums,
-    clippy::exhaustive_structs,
-    clippy::single_match,
     clippy::missing_errors_doc,
     clippy::missing_panics_doc,
-    clippy::struct_excessive_bools
+    clippy::question_mark_used,
+    clippy::single_call_fn,
+    clippy::single_match,
+    clippy::panic,
+    clippy::std_instead_of_alloc,
+    clippy::expect_used,
+    clippy::indexing_slicing
 )]
 
-pub use args::AppArgs;
-pub use buffer::Buffer;
+use args::AppArgs;
+use buffer::Buffer;
 use clap::Parser;
-pub use editor::Position;
-pub use editor::SearchDirection;
-pub use filetype::FileType;
-pub use filetype::HighlightingOptions;
-pub use row::Row;
-pub use terminal::Terminal;
+use editor::Position;
+use editor::SearchDirection;
+use filetype::FileType;
+use filetype::HighlightingOptions;
+use row::Row;
+use terminal::Terminal;
 
 use editor::Editor;
 
