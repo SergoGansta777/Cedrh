@@ -73,6 +73,7 @@ impl Row {
     }
 
     #[must_use]
+    #[allow(dead_code)]
     pub fn is_empty(&self) -> bool {
         self.len == 0
     }

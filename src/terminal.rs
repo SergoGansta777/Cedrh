@@ -19,6 +19,7 @@ pub struct Terminal {
 }
 
 impl Terminal {
+    #[allow(clippy::unnecessary_wraps)]
     pub fn new() -> Result<Self, Error> {
         let size = terminal::size().unwrap_or((40, 40));
         terminal::enable_raw_mode().ok();
@@ -79,6 +80,7 @@ impl Terminal {
         stdout().execute(cursor::EnableBlinking).ok();
     }
 
+    #[allow(dead_code)]
     pub fn change_cursor() {
         stdout().execute(cursor::SetCursorStyle::BlinkingBar).ok();
     }
