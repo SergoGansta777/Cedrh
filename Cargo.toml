@@ -8,6 +8,7 @@ cedrh - simple console text-editor with syntax highighting written in Rust
 """
 keywords = ["text-editor", "editor", "terminal", "utf-8", "Rust"]
 categories = ["text-editors", "development-tools"]
+license = "MIT OR Apache-2.0"
 
 [dependencies]
 clap = { version = "4.4.11", features = ["derive"] }
