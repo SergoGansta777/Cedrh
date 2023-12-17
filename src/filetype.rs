@@ -89,6 +89,7 @@ impl FileType {
         }
     }
 
+    #[allow(clippy::too_many_lines)]
     fn get_rust_filetype() -> FileType {
         FileType {
             name: String::from("Rust"),
@@ -241,6 +242,7 @@ impl FileType {
         }
     }
 
+    #[allow(clippy::too_many_lines)]
     fn get_cpp_filetype() -> FileType {
         FileType {
             name: String::from("C++"),
@@ -422,6 +424,7 @@ impl FileType {
         }
     }
 
+    #[allow(clippy::too_many_lines)]
     fn get_csharp_filetype() -> FileType {
         FileType {
             name: String::from("C#"),

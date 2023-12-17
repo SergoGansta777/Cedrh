@@ -144,8 +144,8 @@ impl Editor {
             ""
         };
         let mut file_name = "[No Name]".to_string();
-        if let Some(name) = &self.buffer.file_name {
-            file_name = name.clone();
+        if let Some(name) = &self.buffer.file_name() {
+            file_name = (*name).clone();
             file_name.truncate(20);
         }
 
@@ -230,13 +230,13 @@ impl Editor {
     }
 
     fn save(&mut self) {
-        if self.buffer.file_name.is_none() {
+        if self.buffer.file_name().is_none() {
             let new_name = self.prompt("Save as ", |_, _, _| {}).unwrap_or(None);
             if new_name.is_none() {
                 self.status_message = StatusMessage::from("Save aborted.".to_string());
                 return;
             }
-            self.buffer.file_name = new_name;
+            self.buffer.set_file_name(new_name);
         }
 
         if self.buffer.save().is_ok() {
@@ -299,6 +299,7 @@ impl Editor {
         }
     }
 
+    #[allow(clippy::unnecessary_wraps)]
     fn process_keypress(&mut self, pressed_key: KeyEvent) -> Result<(), std::io::Error> {
         match (pressed_key.modifiers, pressed_key.code) {
             (KeyModifiers::CONTROL, KeyCode::Char('q')) => {
@@ -329,14 +330,17 @@ impl Editor {
                 self.buffer.insert(&self.cursor_position, '\n');
                 self.move_cursor(KeyCode::Right);
             }
-            (_, KeyCode::Up)
-            | (_, KeyCode::Down)
-            | (_, KeyCode::Left)
-            | (_, KeyCode::Right)
-            | (_, KeyCode::PageUp)
-            | (_, KeyCode::PageDown)
-            | (_, KeyCode::End)
-            | (_, KeyCode::Home) => self.move_cursor(pressed_key.code),
+            (
+                _,
+                KeyCode::Up
+                | KeyCode::Down
+                | KeyCode::Left
+                | KeyCode::Right
+                | KeyCode::PageUp
+                | KeyCode::PageDown
+                | KeyCode::End
+                | KeyCode::Home,
+            ) => self.move_cursor(pressed_key.code),
             _ => (),
         }
         self.scroll();

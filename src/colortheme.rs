@@ -9,13 +9,14 @@ use crossterm::style::Color;
 #[must_use]
 pub fn get_colors(term: &str) -> HashMap<String, Color> {
     match term {
-        "xterm-kitty" | "ansi" => parse_kitty_config("~/.config/kitty/current-theme.conf")
-            .unwrap_or(get_default_colors().unwrap()),
-        _ => get_default_colors().unwrap(),
+        "xterm-kitty" | "ansi" => {
+            parse_kitty_config("~/.config/kitty/current-theme.conf").unwrap_or(get_default_colors())
+        }
+        _ => get_default_colors(),
     }
 }
-
-fn get_default_colors() -> Result<HashMap<String, Color>> {
+#[allow(clippy::too_many_lines)]
+fn get_default_colors() -> HashMap<String, Color> {
     let mut colors = HashMap::new();
     colors.insert(
         "active_border_color".to_owned(),
@@ -169,7 +170,7 @@ fn get_default_colors() -> Result<HashMap<String, Color>> {
             b: 0,
         },
     );
-    Ok(colors)
+    colors
 }
 
 fn parse_kitty_config(config_path: &str) -> Result<HashMap<String, Color>> {
@@ -191,7 +192,7 @@ fn parse_kitty_config(config_path: &str) -> Result<HashMap<String, Color>> {
             let mut parts = line.split_whitespace();
             match (parts.next(), parts.next()) {
                 (Some(color_name), Some(color_value)) => {
-                    colors.insert(color_name.to_string(), parse_hex_to_rgb(color_value));
+                    colors.insert(color_name.to_owned(), parse_hex_to_rgb(color_value));
                 }
                 _ => {}
             }
@@ -200,6 +201,7 @@ fn parse_kitty_config(config_path: &str) -> Result<HashMap<String, Color>> {
     Ok(colors)
 }
 
+#[allow(clippy::indexing_slicing, clippy::string_slice)]
 fn parse_hex_to_rgb(hex_code: &str) -> Color {
     let red = u8::from_str_radix(&hex_code[1..3], 16)
         .unwrap_or_else(|_| panic!("Invalid red hex code: {hex_code}"));

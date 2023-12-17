@@ -52,7 +52,7 @@ impl Row {
                 current_highlighting = Cow::Borrowed(highlighting_type);
                 result.push_str(
                     format!("{}", SetForegroundColor(highlighting_type.to_color(colors))).as_str(),
-                )
+                );
             }
 
             if grapheme == "\t" {

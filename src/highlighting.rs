@@ -17,6 +17,7 @@ pub enum Type {
     Brackets,
 }
 
+// TODO: Imporve color distribution here
 impl Type {
     pub fn to_color(self, colors: &HashMap<String, Color>) -> Color {
         match self {

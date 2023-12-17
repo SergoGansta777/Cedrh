@@ -1,6 +1,6 @@
+use core::usize;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader, BufWriter, Error, Write};
-use std::usize;
 
 use crate::FileType;
 use crate::Position;
@@ -10,7 +10,7 @@ use crate::SearchDirection;
 #[derive(Default)]
 pub struct Buffer {
     rows: Vec<Row>,
-    pub file_name: Option<String>,
+    file_name: Option<String>,
     modificated: bool,
     file_type: FileType,
 }
@@ -27,7 +27,7 @@ impl Buffer {
 
         Ok(Self {
             rows,
-            file_name: Some(filename.to_string()),
+            file_name: Some(filename.to_owned()),
             modificated: false,
             file_type,
         })
@@ -36,6 +36,15 @@ impl Buffer {
     #[must_use]
     pub fn file_type(&self) -> String {
         self.file_type.name()
+    }
+
+    #[must_use]
+    pub fn file_name(&self) -> Option<&String> {
+        self.file_name.as_ref()
+    }
+
+    pub fn set_file_name(&mut self, new_file_name: Option<String>) {
+        self.file_name = new_file_name;
     }
 
     #[must_use]
@@ -68,21 +77,21 @@ impl Buffer {
         self.rows.insert(at.y + 1, new_row);
     }
 
-    pub fn insert(&mut self, at: &Position, c: char) {
+    pub fn insert(&mut self, at: &Position, ch: char) {
         if at.y > self.rows.len() {
             return;
         }
         self.modificated = true;
-        if c == '\n' {
+        if ch == '\n' {
             self.insert_newline(at);
         } else if at.y == self.rows.len() {
             let mut row = Row::default();
-            row.insert(0, c);
+            row.insert(0, ch);
             self.rows.push(row);
         } else {
             #[allow(clippy::indexing_slicing)]
             let row = &mut self.rows[at.y];
-            row.insert(at.x, c);
+            row.insert(at.x, ch);
         }
         self.unhighlight_rows(at.y);
     }
@@ -113,7 +122,7 @@ impl Buffer {
     }
 
     pub fn save(&mut self) -> Result<(), Error> {
-        if let Some(file_name) = &self.file_name {
+        if let Some(file_name) = self.file_name() {
             let file = File::create(file_name)?;
             let mut writer = BufWriter::new(file);
 
@@ -133,7 +142,6 @@ impl Buffer {
         self.modificated
     }
 
-    //TODO: refactor this
     #[allow(clippy::indexing_slicing)]
     #[must_use]
     pub fn find(&self, query: &str, at: &Position, direction: SearchDirection) -> Option<Position> {
