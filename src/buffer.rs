@@ -99,7 +99,7 @@ impl Buffer {
     fn unhighlight_rows(&mut self, start: usize) {
         let start = start.saturating_sub(1);
         for row in self.rows.iter_mut().skip(start) {
-            row.is_highlighted = false;
+            *row.is_highlighted() = false;
         }
     }
 

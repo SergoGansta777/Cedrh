@@ -18,6 +18,11 @@ pub enum Type {
 }
 
 // TODO: Imporve color distribution here
+#[allow(
+    clippy::match_same_arms,
+    clippy::indexing_slicing,
+    clippy::match_wildcard_for_single_variants
+)]
 impl Type {
     pub fn to_color(self, colors: &HashMap<String, Color>) -> Color {
         match self {

@@ -1,4 +1,4 @@
-#![warn(clippy::all, clippy::pedantic, clippy::restriction)]
+#![warn(clippy::all, clippy::pedantic)]
 #![allow(
     clippy::missing_docs_in_private_items,
     clippy::implicit_return,
@@ -11,18 +11,21 @@
     clippy::question_mark_used,
     clippy::single_call_fn,
     clippy::single_match,
-    clippy::panic
+    clippy::panic,
+    clippy::std_instead_of_alloc,
+    clippy::expect_used,
+    clippy::indexing_slicing
 )]
 
-pub use args::AppArgs;
-pub use buffer::Buffer;
-pub use clap::Parser;
-pub use editor::Position;
-pub use editor::SearchDirection;
-pub use filetype::FileType;
-pub use filetype::HighlightingOptions;
-pub use row::Row;
-pub use terminal::Terminal;
+use args::AppArgs;
+use buffer::Buffer;
+use clap::Parser;
+use editor::Position;
+use editor::SearchDirection;
+use filetype::FileType;
+use filetype::HighlightingOptions;
+use row::Row;
+use terminal::Terminal;
 
 use editor::Editor;
 
