@@ -36,6 +36,8 @@ impl Buffer {
     #[must_use]
     pub fn file_type(&self) -> String {
         self.file_type.name()
+        let hello = "string";
+        let number = 32;
     }
 
     #[must_use]
