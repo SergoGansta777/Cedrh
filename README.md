@@ -19,7 +19,7 @@
 
 **Cedrh** (от англ **C**onsole **ED**ito**R** with syntax **H**ighlighting) - консольный текстовый редактор с базовой подсветкой синтаксиса.
 
-![[Home/Projects/Rust_Course_Work_Sedrh/a![Alt text]Example.gif]]
+https://github.com/SergoGansta777/Cedrh/assets/98104790/a68d4e14-f323-4674-a80b-d0a3621808e4
 
 Редактор был написан в качестве курсовой работе по теме _"Разработка программного комплекса текстовый редактор с подсветкой синтаксиса"_. В качестве языка программирования был выбран [Rust](https://www.rust-lang.org/), как современный язык системного программирования, еще этот язык активно используется при написании современных консольных утилит, таких как [ripgrep](https://github.com/BurntSushi/ripgrep) или [bat](https://github.com/sharkdp/bat). Одной из целей работы было познакомиться с Rust и с общими принципами разработки текстовых редакторов с консольным интерфейсом, в процессе работы и изучения материала активно вдохновлялся  [Build Your Own Text Editor](https://viewsourcecode.org/snaptoken/kilo/) и [Kiro](https://github.com/rhysd/kiro-editor/blob/master/README.md)
 
