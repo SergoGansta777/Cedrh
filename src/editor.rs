@@ -18,6 +18,7 @@ use crate::Terminal;
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 const EDITOR_NAME: &str = env!("CARGO_PKG_NAME");
 const ADDITIONAL_QUIT_TIMES: u8 = 1;
+const INDENT_COUNT_SPACES: u8 = 4;
 
 #[derive(PartialEq, Copy, Clone)]
 #[non_exhaustive]
@@ -322,6 +323,12 @@ impl Editor {
             }
             (KeyModifiers::CONTROL, KeyCode::Char('s')) => self.save(),
             (KeyModifiers::CONTROL, KeyCode::Char('f')) => self.search(),
+            (KeyModifiers::NONE, KeyCode::Tab) => {
+                for _ in 0..INDENT_COUNT_SPACES {
+                    self.buffer.insert(&self.cursor_position, ' ');
+                    self.move_cursor(KeyCode::Right);
+                }
+            }
             (_, KeyCode::Char(ch)) => {
                 self.buffer.insert(&self.cursor_position, ch);
                 self.move_cursor(KeyCode::Right);

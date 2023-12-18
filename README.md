@@ -12,8 +12,8 @@
     - [Binary](#binary)
   - [Usages](#usages)
   - [Mappings](#mappings)
-      - [Operations](#operations)
-      - [Navigation](#navigation)
+    - [Operations](#operations)
+    - [Navigation](#navigation)
 
 ## Overview
 
@@ -62,6 +62,11 @@ cedrh
 ### Binary
 
 1. Клонируйте этот репозиторий
+
+```zsh
+git clone https://github.com/SergoGansta777/Cedrh.git
+```
+
 2. Установите [rust](https://www.rust-lang.org/tools/install)
 3. Запустите следующую команду в корне репозитория:
 
@@ -69,13 +74,13 @@ cedrh
 cargo build --release
 ```
 
-1. Затем вы можете запустить собранное приложение:
+4. Затем вы можете запустить собранное приложение:
 
 ```zsh
-cargo run target/release/cedrh   
+cargo run target/release/cedrh
 ```
 
-1. Затем вы можете добавить символическую ссылку для запуска приложения
+5. Затем вы можете добавить символическую ссылку для запуска приложения
 
 ## Usages
 
@@ -99,20 +104,20 @@ cedrh file
 
 #### Operations
 
-| Mapping| Description|
-|--|--|
-| `Ctrl-q`| Выйти |
-| `Ctrl-s`| Сохранить текущий файл|
-| `Ctrl-f`| Инкрементный поиск|
-| `↑` or ← after `Ctrl-f`| Предыдущее совпадение |
-| ↓ or → after `Ctrl-f`| Следущее совпадение |
+| Mapping                   | Description            |
+| ------------------------- | ---------------------- |
+| `Ctrl-q`                  | Выйти                  |
+| `Ctrl-s`                  | Сохранить текущий файл |
+| `Ctrl-f`                  | Инкрементный поиск     |
+| `↑` or '←' after `Ctrl-f` | Предыдущее совпадение  |
+| '↓' or '→' after `Ctrl-f` | Следущее совпадение    |
 
 #### Navigation
 
-| Mapping | Description|
-| -- | -- |
-| `↑`                    | Передвинуть курсор вверх                    |
-| `↓`                    | Передвинуть курсор вниз                |
-| `→`                    | Передвинуть курсор вправо               |
-| `←`                    | Передвинуть курсов влево               |
-| Home | Начало документа |
+| Mapping | Description               |
+| ------- | ------------------------- |
+| `↑`     | Передвинуть курсор вверх  |
+| `↓`     | Передвинуть курсор вниз   |
+| `→`     | Передвинуть курсор вправо |
+| `←`     | Передвинуть курсов влево  |
+| Home    | Начало документа          |
