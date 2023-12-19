@@ -1,5 +1,5 @@
 use core::usize;
-use std::fs::File;
+use std::fs::{File, OpenOptions};
 use std::io::{self, BufRead, BufReader, BufWriter, Error, Write};
 
 use crate::FileType;
@@ -17,7 +17,11 @@ pub struct Buffer {
 
 impl Buffer {
     pub fn open(filename: &str) -> io::Result<Self> {
-        let file = File::open(filename)?;
+        let file = OpenOptions::new()
+            .read(true)
+            .write(true)
+            .create(true)
+            .open(filename)?;
         let reader = BufReader::new(file);
         let file_type = FileType::from(filename);
         let rows = reader
