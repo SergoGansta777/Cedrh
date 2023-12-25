@@ -12,8 +12,6 @@ keywords = [
   "terminal",
   "utf-8",
   "Rust",
-  "syntax-highlighting",
-  "light",
 ]
 categories = ["text-editors", "development-tools"]
 license = "MIT OR Apache-2.0"
