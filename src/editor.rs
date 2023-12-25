@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use std::time::Instant;
 use std::{env, io::Error};
 
+use crossterm::event::KeyEventKind;
 use crossterm::{
     event::{Event, KeyCode, KeyEvent, KeyModifiers},
     style::Color,
@@ -295,7 +296,9 @@ impl Editor {
         let event = Terminal::read()?;
 
         match event {
-            Event::Key(pressed_key) => self.process_keypress(pressed_key),
+            Event::Key(pressed_key) if pressed_key.kind == KeyEventKind::Press => {
+                self.process_keypress(pressed_key)
+            }
             Event::Resize(width, height) => {
                 self.terminal.size.width = width;
                 self.terminal.size.height =
