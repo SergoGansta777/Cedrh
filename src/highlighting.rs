@@ -17,7 +17,7 @@ pub enum Type {
     Brackets,
 }
 
-// TODO: Imporve color distribution here
+// TODO: Improve color distribution here
 #[allow(
     clippy::match_same_arms,
     clippy::indexing_slicing,
