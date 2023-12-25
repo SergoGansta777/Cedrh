@@ -6,7 +6,15 @@ authors = ["Sergey Nechoroshev <sergo777ser777@gmail.com>"]
 description = """
 cedrh - simple console text-editor with syntax highighting written in Rust
 """
-keywords = ["text-editor", "editor", "terminal", "utf-8", "Rust"]
+keywords = [
+  "text-editor",
+  "editor",
+  "terminal",
+  "utf-8",
+  "Rust",
+  "syntax-highlighting",
+  "light",
+]
 categories = ["text-editors", "development-tools"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/SergoGansta777/Cedrh"
