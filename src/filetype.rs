@@ -343,6 +343,8 @@ impl FileType {
                 .map(|st| (*st).to_owned())
                 .collect(),
                 secondary_keywords: vec![
+                    "string",
+                    "size_t",
                     "bool",
                     "char",
                     "char8_t",

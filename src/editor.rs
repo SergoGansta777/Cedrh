@@ -115,7 +115,6 @@ impl Editor {
 
         if self.should_quit {
             Terminal::quit();
-            println!("Goodbye!\r");
         } else {
             self.buffer.highlight(
                 &self.highlighted_word,

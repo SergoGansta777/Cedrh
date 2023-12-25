@@ -48,6 +48,7 @@ impl Terminal {
         stdout()
             .execute(terminal::Clear(terminal::ClearType::All))
             .ok();
+        println!("Goodbye!\r");
         terminal::disable_raw_mode().ok();
     }
 
