@@ -6,12 +6,18 @@ use std::path::PathBuf;
 
 use crossterm::style::Color;
 
+const CUSTOM_CONFIG_PATH: &str = "~/.config/cedrh/cedrh.conf";
+
 #[must_use]
 pub fn get_colors(term: &str) -> HashMap<String, Color> {
+    if let Ok(custom_config) = parse_simple_config(CUSTOM_CONFIG_PATH) {
+        return custom_config;
+    }
     match term {
-        "xterm-kitty" | "ansi" => {
-            parse_kitty_config("~/.config/kitty/current-theme.conf").unwrap_or(get_default_colors())
-        }
+        "xterm-kitty" | "ansi" => parse_simple_config("~/.config/kitty/current-theme.conf")
+            .unwrap_or(
+                parse_simple_config("`/.config/kitty/kitty.conf`").unwrap_or(get_default_colors()),
+            ),
         _ => get_default_colors(),
     }
 }
@@ -173,7 +179,7 @@ fn get_default_colors() -> HashMap<String, Color> {
     colors
 }
 
-fn parse_kitty_config(config_path: &str) -> Result<HashMap<String, Color>> {
+fn parse_simple_config(config_path: &str) -> Result<HashMap<String, Color>> {
     let expanded_path = tilde(config_path);
     let path = PathBuf::from(expanded_path.into_owned());
     let file = File::open(path)?;
