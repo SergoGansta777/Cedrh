@@ -6,110 +6,102 @@ use std::path::PathBuf;
 
 use crossterm::style::Color;
 
-const CUSTOM_CONFIG_PATH: &str = "~/.config/cedrh/cedrh.conf";
+const CUSTOM_CONFIG_PATH: &str = "/path/to/custom-config";
+const KITTY_THEME_PATH: &str = "/home/user/.config/kitty/current-theme.conf";
+const KITTY_CONF_PATH: &str = "/home/user/.config/kitty/kitty.conf";
 
-#[must_use]
-pub fn get_colors(term: &str) -> HashMap<String, Color> {
-    if let Ok(custom_config) = parse_simple_config(CUSTOM_CONFIG_PATH) {
-        return custom_config;
+pub fn get_colors(term: &str, use_default: bool) -> HashMap<String, Color> {
+    if use_default {
+        return get_default_colors();
     }
-    match term {
-        "xterm-kitty" | "ansi" => parse_simple_config("~/.config/kitty/current-theme.conf")
-            .unwrap_or(
-                parse_simple_config("`/.config/kitty/kitty.conf`").unwrap_or(get_default_colors()),
-            ),
-        _ => get_default_colors(),
+
+    if let Ok(custom_config) = parse_simple_config(CUSTOM_CONFIG_PATH) {
+        custom_config
+    } else {
+        match term {
+            "xterm-kitty" | "ansi" => parse_simple_config(KITTY_THEME_PATH)
+                .or_else(|_| parse_simple_config(KITTY_CONF_PATH))
+                .unwrap_or_else(|_| get_default_colors()),
+            _ => get_default_colors(),
+        }
     }
 }
+
 #[allow(clippy::too_many_lines)]
 fn get_default_colors() -> HashMap<String, Color> {
     let mut colors = HashMap::new();
     colors.insert(
         "active_border_color".to_owned(),
-        Color::Rgb { r: 0, g: 0, b: 0 },
-    );
-    colors.insert(
-        "active_border_color".to_owned(),
-        Color::Rgb { r: 0, g: 0, b: 0 },
-    );
-    colors.insert(
-        "foreground".to_owned(),
         Color::Rgb {
-            r: 63,
-            g: 63,
-            b: 63,
+            r: 172,
+            g: 170,
+            b: 255,
         },
     );
-    colors.insert(
-        "background".to_owned(),
-        Color::Rgb {
-            r: 253,
-            g: 253,
-            b: 253,
-        },
-    );
+    colors.insert("foreground".to_owned(), Color::Rgb { r: 6, g: 5, b: 22 });
+    colors.insert("background".to_owned(), Color::Rgb { r: 6, g: 5, b: 22 });
     colors.insert(
         "color0".to_owned(),
         Color::Rgb {
-            r: 220,
-            g: 163,
-            b: 163,
+            r: 0,
+            g: 194,
+            b: 186,
         },
     );
     colors.insert(
         "color1".to_owned(),
         Color::Rgb {
-            r: 38,
-            g: 139,
-            b: 210,
+            r: 68,
+            g: 168,
+            b: 231,
         },
     );
     colors.insert(
         "color2".to_owned(),
         Color::Rgb {
-            r: 41,
-            g: 174,
-            b: 26,
+            r: 166,
+            g: 227,
+            b: 161,
         },
     );
     colors.insert(
         "color3".to_owned(),
         Color::Rgb {
-            r: 108,
-            g: 113,
-            b: 196,
+            r: 172,
+            g: 170,
+            b: 255,
         },
     );
     colors.insert(
         "color4".to_owned(),
         Color::Rgb {
-            r: 181,
-            g: 137,
-            b: 0,
+            r: 171,
+            g: 139,
+            b: 227,
         },
     );
     colors.insert(
         "color5".to_owned(),
         Color::Rgb {
-            r: 42,
-            g: 161,
-            b: 152,
+            r: 243,
+            g: 139,
+            b: 168,
         },
     );
     colors.insert(
         "color6".to_owned(),
         Color::Rgb {
-            r: 133,
-            g: 153,
-            b: 0,
+            r: 249,
+            g: 226,
+            b: 175,
         },
     );
     colors.insert(
         "color7".to_owned(),
         Color::Rgb {
-            r: 255,
-            g: 255,
-            b: 255,
+            r: 186,
+            g: 194,
+            b: 222,
         },
     );
     colors.insert(

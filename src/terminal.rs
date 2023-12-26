@@ -4,7 +4,7 @@ use crossterm::{
     cursor,
     event::{read, Event},
     style::{Color, ResetColor, SetBackgroundColor, SetForegroundColor},
-    terminal, ExecutableCommand, QueueableCommand,
+    terminal, ExecutableCommand,
 };
 use std::io::{self, stdout, Error, Write};
 
@@ -61,7 +61,7 @@ impl Terminal {
         let y = y as u16;
 
         stdout()
-            .queue(cursor::MoveTo(x.saturating_sub(1), y.saturating_sub(1)))
+            .execute(cursor::MoveTo(x.saturating_sub(1), y.saturating_sub(1)))
             .ok();
     }
 

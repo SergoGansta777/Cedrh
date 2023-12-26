@@ -17,12 +17,13 @@
   - [Additional Info about Syntax Highlighting](#additional-info-about-syntax-highlighting)
     - [List supported terminals](#list-supported-terminals)
     - [Directory path of custom config](#directory-path-of-custom-config)
+    - [Example of custom config](#example-of-custom-config)
 
 ## Overview
 
 **Cedrh** (от англ **C**onsole **ED**ito**R** with syntax **H**ighlighting) - консольный текстовый редактор с базовой подсветкой синтаксиса.
 
-https://github.com/SergoGansta777/Cedrh/assets/98104790/a68d4e14-f323-4674-a80b-d0a3621808e4
+<https://github.com/SergoGansta777/Cedrh/assets/98104790/a68d4e14-f323-4674-a80b-d0a3621808e4>
 
 Редактор был написан в качестве курсовой работе по теме _"Разработка программного комплекса текстовый редактор с подсветкой синтаксиса"_. В качестве языка программирования был выбран [Rust](https://www.rust-lang.org/), как современный язык системного программирования, еще этот язык активно используется при написании современных консольных утилит, таких как [ripgrep](https://github.com/BurntSushi/ripgrep) или [bat](https://github.com/sharkdp/bat). Одной из целей работы было познакомиться с Rust и с общими принципами разработки текстовых редакторов с консольным интерфейсом, в процессе работы и изучения материала активно вдохновлялся  [Build Your Own Text Editor](https://viewsourcecode.org/snaptoken/kilo/) и [Kiro](https://github.com/rhysd/kiro-editor/blob/master/README.md)
 
@@ -141,3 +142,46 @@ cedrh file
 
 - `Linux/MacOs`: "~/.config/cedrh/cedrh.conf"
 - Windows: **work in progress**
+
+### Example of custom config
+
+```
+foreground              #CDD6F4
+background              #09081B
+active_border_color     #B4BEFE
+
+# The 16 terminal colors
+
+# black
+color0 #45475A
+color8 #585B70
+
+# red
+color1 #F38BA8
+color9 #F38BA8
+
+# green
+color2  #A6E3A1
+color10 #A6E3A1
+
+# yellow
+color3  #F9E2AF
+color11 #F9E2AF
+
+# blue
+color4  #89B4FA
+color12 #89B4FA
+
+# magenta
+color5  #F5C2E7
+color13 #F5C2E7
+
+# cyan
+color6  #94E2D5
+color14 #94E2D5
+
+# white
+color7  #BAC2DE
+color15 #A6ADC8
+
+```
