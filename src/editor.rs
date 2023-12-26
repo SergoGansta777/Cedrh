@@ -452,7 +452,7 @@ impl Editor {
             x = width;
         }
 
-        self.cursor_position = Position { x, y };
+        self.cursor_position = Position { x, y }
     }
 
     fn draw_welcome_message(&self) {
