@@ -31,9 +31,9 @@ impl Type {
             Type::Character => colors["color5"],
             Type::Comment | Type::MultilineComment => colors["color0"],
             Type::PrimaryKeywords => colors["color4"],
-            Type::SecondaryKeywords => colors["color5"],
+            Type::SecondaryKeywords => colors["color6"],
             Type::Operators => colors["color1"],
-            Type::Brackets => colors["color6"],
+            Type::Brackets => colors["color5"],
             _ => colors["color7"],
         }
     }
