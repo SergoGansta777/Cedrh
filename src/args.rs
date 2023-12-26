@@ -18,4 +18,8 @@ use clap::Parser;
 pub struct AppArgs {
     /// File to edit
     pub file: Option<String>,
+
+    /// Use default color pallete
+    #[arg(long, short = 'd')]
+    pub default_colors: bool,
 }

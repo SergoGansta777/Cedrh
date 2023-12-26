@@ -89,7 +89,7 @@ impl Editor {
             status_message: StatusMessage::from(initial_status),
             quit_times: ADDITIONAL_QUIT_TIMES,
             highlighted_word: None,
-            colors: get_colors(&term),
+            colors: get_colors(&term, args.default_colors),
         }
     }
 

@@ -1,20 +1,12 @@
 [package]
 name = "cedrh"
-version = "0.3.5"
+version = "0.3.6"
 edition = "2021"
 authors = ["Sergey Nechoroshev <sergo777ser777@gmail.com>"]
 description = """
 cedrh - simple console text-editor with syntax highighting written in Rust
 """
-keywords = [
-  "text-editor",
-  "editor",
-  "terminal",
-  "utf-8",
-  "Rust",
-  "syntax-highlighting",
-  "light",
-]
+keywords = ["text-editor", "editor", "terminal", "utf-8", "Rust"]
 categories = ["text-editors", "development-tools"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/SergoGansta777/Cedrh"

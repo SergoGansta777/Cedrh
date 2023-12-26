@@ -6,21 +6,27 @@ use std::path::PathBuf;
 
 use crossterm::style::Color;
 
-const CUSTOM_CONFIG_PATH: &str = "~/.config/cedrh/cedrh.conf";
+const CUSTOM_CONFIG_PATH: &str = "/path/to/custom-config";
+const KITTY_THEME_PATH: &str = "/home/user/.config/kitty/current-theme.conf";
+const KITTY_CONF_PATH: &str = "/home/user/.config/kitty/kitty.conf";
 
-#[must_use]
-pub fn get_colors(term: &str) -> HashMap<String, Color> {
-    if let Ok(custom_config) = parse_simple_config(CUSTOM_CONFIG_PATH) {
-        return custom_config;
+pub fn get_colors(term: &str, use_default: bool) -> HashMap<String, Color> {
+    if use_default {
+        return get_default_colors();
     }
-    match term {
-        "xterm-kitty" | "ansi" => parse_simple_config("~/.config/kitty/current-theme.conf")
-            .unwrap_or(
-                parse_simple_config("`/.config/kitty/kitty.conf`").unwrap_or(get_default_colors()),
-            ),
-        _ => get_default_colors(),
+
+    if let Ok(custom_config) = parse_simple_config(CUSTOM_CONFIG_PATH) {
+        custom_config
+    } else {
+        match term {
+            "xterm-kitty" | "ansi" => parse_simple_config(KITTY_THEME_PATH)
+                .or_else(|_| parse_simple_config(KITTY_CONF_PATH))
+                .unwrap_or_else(|_| get_default_colors()),
+            _ => get_default_colors(),
+        }
     }
 }
+
 #[allow(clippy::too_many_lines)]
 fn get_default_colors() -> HashMap<String, Color> {
     let mut colors = HashMap::new();
