@@ -206,27 +206,29 @@ impl Editor {
 
             let event = Terminal::read()?;
             if let Event::Key(key) = event {
-                match key.code {
-                    KeyCode::Backspace => {
-                        let graphemes_count = result.graphemes(true).count();
-                        result = result
-                            .graphemes(true)
-                            .take(graphemes_count.saturating_sub(1))
-                            .collect();
-                    }
-                    KeyCode::Enter => break,
-                    KeyCode::Char(ch) => {
-                        if !ch.is_control() {
-                            result.push(ch);
+                if key.kind == KeyEventKind::Press {
+                    match key.code {
+                        KeyCode::Backspace => {
+                            let graphemes_count = result.graphemes(true).count();
+                            result = result
+                                .graphemes(true)
+                                .take(graphemes_count.saturating_sub(1))
+                                .collect();
                         }
+                        KeyCode::Enter => break,
+                        KeyCode::Char(ch) => {
+                            if !ch.is_control() {
+                                result.push(ch);
+                            }
+                        }
+                        KeyCode::Esc => {
+                            result.truncate(0);
+                            break;
+                        }
+                        _ => (),
                     }
-                    KeyCode::Esc => {
-                        result.truncate(0);
-                        break;
-                    }
-                    _ => (),
+                    callback(self, key, &result);
                 }
-                callback(self, key, &result);
             }
         }
         self.status_message = StatusMessage::from(String::new());
