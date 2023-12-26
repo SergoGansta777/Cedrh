@@ -17,7 +17,6 @@ pub enum Type {
     Brackets,
 }
 
-// TODO: Improve color distribution here
 #[allow(
     clippy::match_same_arms,
     clippy::indexing_slicing,
@@ -26,15 +25,15 @@ pub enum Type {
 impl Type {
     pub fn to_color(self, colors: &HashMap<String, Color>) -> Color {
         match self {
-            Type::Number => colors["color6"],
+            Type::Number => colors["color3"],
             Type::Match => colors["color0"],
             Type::String => colors["color2"],
             Type::Character => colors["color5"],
             Type::Comment | Type::MultilineComment => colors["color0"],
             Type::PrimaryKeywords => colors["color4"],
             Type::SecondaryKeywords => colors["color5"],
-            Type::Operators => colors["color9"],
-            Type::Brackets => colors["color3"],
+            Type::Operators => colors["color1"],
+            Type::Brackets => colors["color6"],
             _ => colors["color7"],
         }
     }

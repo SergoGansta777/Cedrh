@@ -176,9 +176,9 @@ impl Editor {
             *self
                 .colors
                 .get("active_border_color")
-                .unwrap_or(&self.colors["foreground"]),
+                .unwrap_or(&self.colors["background"]),
         );
-        Terminal::set_fg_color(self.colors["background"]);
+        Terminal::set_fg_color(self.colors["foreground"]);
         println!("{status}\r");
         Terminal::reset_fg_color();
         Terminal::reset_bg_color();
@@ -335,14 +335,14 @@ impl Editor {
                 self.buffer.insert(&self.cursor_position, ch);
                 self.move_cursor(KeyCode::Right);
             }
-            (_, KeyCode::Delete) => self.buffer.delete(&self.cursor_position),
-            (_, KeyCode::Backspace) => {
+            (KeyModifiers::NONE, KeyCode::Delete) => self.buffer.delete(&self.cursor_position),
+            (KeyModifiers::NONE, KeyCode::Backspace) => {
                 if self.cursor_position.x > 0 || self.cursor_position.y > 0 {
                     self.move_cursor(KeyCode::Left);
                     self.buffer.delete(&self.cursor_position);
                 }
             }
-            (_, KeyCode::Enter) => {
+            (KeyModifiers::NONE, KeyCode::Enter) => {
                 self.buffer.insert(&self.cursor_position, '\n');
                 self.move_cursor(KeyCode::Right);
             }
