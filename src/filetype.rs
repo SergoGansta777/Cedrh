@@ -362,30 +362,9 @@ impl FileType {
                 .map(|st| (*st).to_owned())
                 .collect(),
                 secondary_keywords: vec![
-                    "string",
-                    "size_t",
-                    "bool",
-                    "char",
-                    "char8_t",
-                    "char16_t",
-                    "char32_t",
-                    "double",
-                    "enum",
-                    "float",
-                    "int",
-                    "long",
-                    "short",
-                    "void",
-                    "wchar_t",
-                    "#include",
-                    "template",
-                    "map",
-                    "set",
-                    "stack",
-                    "unordered_map",
-                    "unordered_set",
-                    "queue",
-                    "priority_queue",
+                    "string", "size_t", "bool", "char", "char8_t", "char16_t", "char32_t",
+                    "double", "enum", "float", "int", "long", "byte", "short", "void", "wchar_t",
+                    "#include", "template", "std",
                 ]
                 .iter()
                 .map(|st| (*st).to_owned())
