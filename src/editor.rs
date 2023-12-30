@@ -97,7 +97,7 @@ impl Editor {
     pub fn run(&mut self) {
         loop {
             if let Err(error) = self.refresh_screen() {
-                die(&error);
+                self.die(&error);
             }
 
             if self.should_quit {
@@ -105,7 +105,7 @@ impl Editor {
             }
 
             if let Err(error) = self.process_event() {
-                die(&error);
+                self.die(&error);
             }
         }
     }
@@ -516,8 +516,8 @@ impl Editor {
             }
         }
     }
-}
-
-fn die(error: &Error) {
-    panic!("{}", error);
+    fn die(&self, error: &Error) {
+        self.terminal.borrow_mut().clear_screen();
+        panic!("{}", error);
+    }
 }

@@ -83,13 +83,6 @@ impl Terminal {
         self.stdout.execute(cursor::Show).ok();
     }
 
-    #[allow(dead_code)]
-    pub fn change_cursor_to_blinking_bar(&mut self) {
-        self.stdout
-            .execute(cursor::SetCursorStyle::BlinkingBar)
-            .ok();
-    }
-
     pub fn clear_current_line(&mut self) {
         self.stdout
             .execute(terminal::Clear(terminal::ClearType::CurrentLine))
