@@ -8,6 +8,7 @@ use crossterm::{
     event::{Event, KeyCode, KeyEvent, KeyModifiers},
     style::Color,
 };
+use std::cell::RefCell;
 use unicode_segmentation::UnicodeSegmentation;
 
 use crate::colortheme::get_colors;
@@ -51,7 +52,7 @@ impl StatusMessage {
 
 pub struct Editor {
     should_quit: bool,
-    terminal: Terminal,
+    terminal: RefCell<Terminal>,
     cursor_position: Position,
     offset: Position,
     buffer: Buffer,
@@ -82,7 +83,7 @@ impl Editor {
 
         Self {
             should_quit: false,
-            terminal: Terminal::new().expect("Failed to initialize terminal"),
+            terminal: RefCell::new(Terminal::new().expect("Failed to initialize terminal")),
             buffer,
             cursor_position: Position::default(),
             offset: Position::default(),
@@ -111,38 +112,40 @@ impl Editor {
 
     #[allow(clippy::as_conversions)]
     fn refresh_screen(&mut self) -> Result<(), Error> {
-        Terminal::cursor_hide();
-        Terminal::cursor_position(&Position::default());
+        self.terminal.borrow_mut().cursor_hide();
+        self.terminal
+            .borrow_mut()
+            .cursor_position(&Position::default());
 
         if self.should_quit {
-            Terminal::quit();
+            self.terminal.borrow_mut().quit();
         } else {
             self.buffer.highlight(
                 &self.highlighted_word,
                 Some(
                     self.offset
                         .y
-                        .saturating_add(self.terminal.size().height as usize),
+                        .saturating_add(self.terminal.borrow_mut().size().height as usize),
                 ),
             );
             self.draw_rows();
             self.draw_status_bar();
             self.draw_message_bar();
 
-            Terminal::cursor_position(&Position {
+            self.terminal.borrow_mut().cursor_position(&Position {
                 x: self.cursor_position.x.saturating_sub(self.offset.x),
                 y: self.cursor_position.y.saturating_sub(self.offset.y),
             });
         }
 
-        Terminal::cursor_show();
-        Terminal::flush()
+        self.terminal.borrow_mut().cursor_show();
+        self.terminal.borrow_mut().flush()
     }
 
     #[allow(clippy::as_conversions)]
     fn draw_status_bar(&self) {
         let mut status;
-        let width = self.terminal.size().width as usize;
+        let width = self.terminal.borrow_mut().size().width as usize;
         let modified_indicator = if self.buffer.is_modificated() {
             " (modified)"
         } else {
@@ -172,25 +175,27 @@ impl Editor {
         status.push_str(&" ".repeat(width.saturating_sub(len)));
         status = format!("{status}{line_indicator}");
         status.truncate(width);
-        Terminal::set_bg_color(
+        self.terminal.borrow_mut().set_bg_color(
             *self
                 .colors
                 .get("active_border_color")
                 .unwrap_or(&self.colors["background"]),
         );
-        Terminal::set_fg_color(self.colors["foreground"]);
+        self.terminal
+            .borrow_mut()
+            .set_fg_color(self.colors["foreground"]);
         println!("{status}\r");
-        Terminal::reset_fg_color();
-        Terminal::reset_bg_color();
+        self.terminal.borrow_mut().reset_fg_color();
+        self.terminal.borrow_mut().reset_bg_color();
     }
 
     #[allow(clippy::as_conversions)]
     fn draw_message_bar(&self) {
-        Terminal::clear_current_line();
+        self.terminal.borrow_mut().clear_current_line();
         let message = &self.status_message;
         if message.time.elapsed() < Duration::new(45, 0) {
             let mut text = message.text.clone();
-            text.truncate(self.terminal.size().width as usize);
+            text.truncate(self.terminal.borrow_mut().size().width as usize);
             print!("{text}");
         }
     }
@@ -302,8 +307,8 @@ impl Editor {
                 self.process_keypress(pressed_key)
             }
             Event::Resize(width, height) => {
-                self.terminal.size.width = width;
-                self.terminal.size.height =
+                self.terminal.borrow_mut().size.width = width;
+                self.terminal.borrow_mut().size.height =
                     height - if env::consts::OS == "windows" { 1 } else { 2 };
                 Ok(())
             }
@@ -373,8 +378,8 @@ impl Editor {
     #[allow(clippy::as_conversions)]
     fn scroll(&mut self) {
         let Position { x, y } = self.cursor_position;
-        let width = self.terminal.size().width as usize;
-        let height = self.terminal.size().height as usize;
+        let width = self.terminal.borrow_mut().size().width as usize;
+        let height = self.terminal.borrow_mut().size().height as usize;
         let offset = &mut self.offset;
 
         if y < offset.y {
@@ -391,7 +396,7 @@ impl Editor {
 
     #[allow(clippy::as_conversions, clippy::arithmetic_side_effects)]
     fn move_cursor(&mut self, key: KeyCode) {
-        let terminal_height = self.terminal.size().height as usize;
+        let terminal_height = self.terminal.borrow_mut().size().height as usize;
         let Position { mut y, mut x } = self.cursor_position;
         let height = self.buffer.len();
         let mut width = if let Some(row) = self.buffer.row(y) {
@@ -467,7 +472,7 @@ impl Editor {
 
     #[allow(clippy::as_conversions)]
     fn draw_centered_message(&self, message: &str) {
-        let width = self.terminal.size().width as usize;
+        let width = self.terminal.borrow_mut().size().width as usize;
         let len = message.len();
 
         #[allow(clippy::arithmetic_side_effects, clippy::integer_division)]
@@ -482,7 +487,7 @@ impl Editor {
 
     #[allow(clippy::as_conversions)]
     pub fn draw_row(&self, row: &Row) {
-        let width = self.terminal.size().width as usize;
+        let width = self.terminal.borrow_mut().size().width as usize;
         let start = self.offset.x;
         let end = self.offset.x.saturating_add(width);
         let row = row.render(&self.colors, start, end);
@@ -495,9 +500,9 @@ impl Editor {
         clippy::as_conversions
     )]
     fn draw_rows(&self) {
-        let height = self.terminal.size().height;
+        let height = self.terminal.borrow_mut().size().height;
         for terminal_row in 0..height {
-            Terminal::clear_current_line();
+            self.terminal.borrow_mut().clear_current_line();
 
             match self
                 .buffer
@@ -514,6 +519,5 @@ impl Editor {
 }
 
 fn die(error: &Error) {
-    Terminal::clear_screen();
     panic!("{}", error);
 }
