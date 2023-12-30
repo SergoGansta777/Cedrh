@@ -25,12 +25,12 @@ pub enum Type {
 impl Type {
     pub fn to_color(self, colors: &HashMap<String, Color>) -> Color {
         match self {
-            Type::Number => colors["color3"],
+            Type::Number => colors["color4"],
             Type::Match => colors["color0"],
             Type::String => colors["color2"],
             Type::Character => colors["color5"],
             Type::Comment | Type::MultilineComment => colors["color0"],
-            Type::PrimaryKeywords => colors["color4"],
+            Type::PrimaryKeywords => colors["color3"],
             Type::SecondaryKeywords => colors["color6"],
             Type::Operators => colors["color1"],
             Type::Brackets => colors["color5"],
