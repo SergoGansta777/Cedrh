@@ -95,6 +95,7 @@ impl Editor {
     }
 
     pub fn run(&mut self) {
+        self.terminal.borrow_mut().enable_alternative_screen();
         loop {
             if let Err(error) = self.refresh_screen() {
                 self.die(&error);
@@ -108,6 +109,7 @@ impl Editor {
                 self.die(&error);
             }
         }
+        self.terminal.borrow_mut().disable_alternative_screen();
     }
 
     #[allow(clippy::as_conversions)]

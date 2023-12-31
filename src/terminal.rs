@@ -4,7 +4,8 @@ use crossterm::{
     cursor,
     event::{read, Event},
     style::{Color, ResetColor, SetBackgroundColor, SetForegroundColor},
-    terminal, QueueableCommand,
+    terminal::{self, EnterAlternateScreen, LeaveAlternateScreen},
+    QueueableCommand,
 };
 use std::io::{self, Error, Stdout, Write};
 
@@ -79,6 +80,14 @@ impl Terminal {
 
     pub fn cursor_show(&mut self) {
         self.stdout.queue(cursor::Show).ok();
+    }
+
+    pub fn enable_alternative_screen(&mut self) {
+        self.stdout.queue(EnterAlternateScreen).ok();
+    }
+
+    pub fn disable_alternative_screen(&mut self) {
+        self.stdout.queue(LeaveAlternateScreen).ok();
     }
 
     pub fn write_row(&mut self, row: &str) {

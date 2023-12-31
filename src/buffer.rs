@@ -11,7 +11,7 @@ use crate::SearchDirection;
 pub struct Buffer {
     rows: Vec<Row>,
     file_name: Option<String>,
-    modificated: bool,
+    modified: bool,
     file_type: FileType,
 }
 
@@ -32,7 +32,7 @@ impl Buffer {
         Ok(Self {
             rows,
             file_name: Some(filename.to_owned()),
-            modificated: false,
+            modified: false,
             file_type,
         })
     }
@@ -85,7 +85,7 @@ impl Buffer {
         if at.y > self.rows.len() {
             return;
         }
-        self.modificated = true;
+        self.modified = true;
         if ch == '\n' {
             self.insert_newline(at);
         } else if at.y == self.rows.len() {
@@ -113,7 +113,7 @@ impl Buffer {
         if at.y >= len {
             return;
         }
-        self.modificated = true;
+        self.modified = true;
         if at.x == self.rows[at.y].len() && at.y + 1 < len {
             let next_row = self.rows.remove(at.y + 1);
             let row = &mut self.rows[at.y];
@@ -135,7 +135,7 @@ impl Buffer {
                 writer.write_all(b"\n")?;
             }
 
-            self.modificated = false;
+            self.modified = false;
             writer.flush()?;
         }
         Ok(())
@@ -143,7 +143,7 @@ impl Buffer {
 
     #[must_use]
     pub fn is_modificated(&self) -> bool {
-        self.modificated
+        self.modified
     }
 
     #[allow(clippy::indexing_slicing)]
@@ -192,6 +192,7 @@ impl Buffer {
         } else {
             self.rows.len()
         };
+
         #[allow(clippy::indexing_slicing)]
         for row in &mut self.rows[..until] {
             start_with_comment = row.highlight(
