@@ -105,6 +105,12 @@ impl Terminal {
             .ok();
     }
 
+    pub fn clear_until_new_line(&mut self) {
+        self.stdout
+            .queue(terminal::Clear(terminal::ClearType::UntilNewLine))
+            .ok();
+    }
+
     pub fn reset_colors(&mut self) {
         self.stdout.queue(ResetColor).ok();
     }

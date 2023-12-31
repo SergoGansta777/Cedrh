@@ -156,7 +156,7 @@ impl Editor {
         let mut file_name = "[No Name]".to_owned();
         if let Some(name) = self.buffer.file_name() {
             file_name = (*name).clone();
-            file_name.truncate(20);
+            file_name.truncate(35);
         }
 
         status = format!(
@@ -498,6 +498,7 @@ impl Editor {
         let row = row.render(&self.colors, start, end);
         self.terminal.borrow_mut().write_row(&row);
         self.terminal.borrow_mut().add_new_line();
+        self.terminal.borrow_mut().clear_until_new_line();
     }
 
     #[allow(
@@ -508,8 +509,6 @@ impl Editor {
     fn draw_rows(&self) {
         let height = self.terminal.borrow_mut().size().height;
         for terminal_row in 0..height {
-            self.terminal.borrow_mut().clear_current_line();
-
             match self
                 .buffer
                 .row(self.offset.y.saturating_add(terminal_row as usize))
