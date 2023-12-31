@@ -81,6 +81,15 @@ impl Terminal {
         self.stdout.queue(cursor::Show).ok();
     }
 
+    pub fn write_row(&mut self, row: &str) {
+        self.stdout.queue(crossterm::style::Print(row)).ok();
+        self.stdout.queue(crossterm::style::Print("\r")).ok();
+    }
+
+    pub fn add_new_line(&mut self) {
+        self.stdout.queue(crossterm::style::Print("\n")).ok();
+    }
+
     pub fn clear_current_line(&mut self) {
         self.stdout
             .queue(terminal::Clear(terminal::ClearType::CurrentLine))
