@@ -95,6 +95,7 @@ impl Editor {
     }
 
     pub fn run(&mut self) {
+        self.terminal.borrow_mut().enable_alternative_screen();
         loop {
             if let Err(error) = self.refresh_screen() {
                 self.die(&error);
@@ -108,6 +109,7 @@ impl Editor {
                 self.die(&error);
             }
         }
+        self.terminal.borrow_mut().disable_alternative_screen();
     }
 
     #[allow(clippy::as_conversions)]
@@ -184,7 +186,9 @@ impl Editor {
         self.terminal
             .borrow_mut()
             .set_fg_color(self.colors["foreground"]);
-        println!("{status}\r");
+
+        self.terminal.borrow_mut().write_row(&status);
+        self.terminal.borrow_mut().add_new_line();
         self.terminal.borrow_mut().reset_fg_color();
         self.terminal.borrow_mut().reset_bg_color();
     }
@@ -196,7 +200,7 @@ impl Editor {
         if message.time.elapsed() < Duration::new(45, 0) {
             let mut text = message.text.clone();
             text.truncate(self.terminal.borrow_mut().size().width as usize);
-            print!("{text}");
+            self.terminal.borrow_mut().write_row(&text);
         }
     }
 
@@ -482,7 +486,8 @@ impl Editor {
         let welcome_message = format!("~{spaces}{message}");
         let truncated_message = welcome_message.chars().take(width).collect::<String>();
 
-        println!("{truncated_message}\r");
+        self.terminal.borrow_mut().write_row(&truncated_message);
+        self.terminal.borrow_mut().add_new_line();
     }
 
     #[allow(clippy::as_conversions)]
@@ -491,7 +496,8 @@ impl Editor {
         let start = self.offset.x;
         let end = self.offset.x.saturating_add(width);
         let row = row.render(&self.colors, start, end);
-        println!("{row}\r");
+        self.terminal.borrow_mut().write_row(&row);
+        self.terminal.borrow_mut().add_new_line();
     }
 
     #[allow(
@@ -512,10 +518,14 @@ impl Editor {
                 None if self.buffer.is_empty() && terminal_row == height / 3 => {
                     self.draw_welcome_message();
                 }
-                None => println!("~\r"),
+                None => {
+                    self.terminal.borrow_mut().write_row("~");
+                    self.terminal.borrow_mut().add_new_line();
+                }
             }
         }
     }
+
     fn die(&self, error: &Error) {
         self.terminal.borrow_mut().clear_screen();
         panic!("{}", error);
