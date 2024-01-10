@@ -51,6 +51,7 @@ impl Terminal {
         self.clear_screen();
         println!("Goodbye!\r");
         terminal::disable_raw_mode().ok();
+        self.flush().ok();
     }
 
     #[allow(clippy::cast_possible_truncation, clippy::as_conversions)]

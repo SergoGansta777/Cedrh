@@ -1,5 +1,5 @@
 use core::time::Duration;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::time::Instant;
 use std::{env, io::Error};
 
@@ -244,6 +244,7 @@ impl Editor {
         if result.is_empty() {
             return Ok(None);
         }
+        self.refresh_screen()?;
         Ok(Some(result))
     }
 
@@ -466,6 +467,8 @@ impl Editor {
         self.cursor_position = Position { x, y }
     }
 
+    /// Draws welcome message when user opens an empty buffer
+    /// This message is centered
     fn draw_welcome_message(&self) {
         let info_message = format!("{EDITOR_NAME} editor --version {VERSION}");
         let welcome_messages = [info_message.as_str(), "Welcome to the club!"];
