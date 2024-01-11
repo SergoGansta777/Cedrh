@@ -1,5 +1,5 @@
 use core::time::Duration;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::time::Instant;
 use std::{env, io::Error};
 
@@ -224,11 +224,13 @@ impl Editor {
                                 .take(graphemes_count.saturating_sub(1))
                                 .collect();
                         }
-                        KeyCode::Enter => break,
                         KeyCode::Char(ch) => {
                             if !ch.is_control() {
                                 result.push(ch);
                             }
+                        }
+                        KeyCode::Enter => {
+                            break;
                         }
                         KeyCode::Esc => {
                             result.truncate(0);
@@ -499,9 +501,9 @@ impl Editor {
         let start = self.offset.x;
         let end = self.offset.x.saturating_add(width);
         let row = row.render(&self.colors, start, end);
+        self.terminal.borrow_mut().clear_current_line();
         self.terminal.borrow_mut().write_row(&row);
         self.terminal.borrow_mut().add_new_line();
-        self.terminal.borrow_mut().clear_until_new_line();
     }
 
     #[allow(
