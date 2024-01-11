@@ -169,7 +169,7 @@ impl Editor {
             "{} | {}/{}",
             self.buffer.file_type(),
             self.cursor_position.y.saturating_add(1),
-            self.buffer.len()
+            self.buffer.len(),
         );
 
         #[allow(clippy::arithmetic_side_effects)]

@@ -106,6 +106,7 @@ impl Terminal {
             .ok();
     }
 
+    #[allow(dead_code)]
     pub fn clear_until_new_line(&mut self) {
         self.stdout
             .queue(terminal::Clear(terminal::ClearType::UntilNewLine))
