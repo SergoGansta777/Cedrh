@@ -114,6 +114,7 @@ impl Editor {
 
     #[allow(clippy::as_conversions)]
     fn refresh_screen(&mut self) -> Result<(), Error> {
+        self.terminal.borrow_mut().begin_synchronized_update();
         self.terminal.borrow_mut().cursor_hide();
         self.terminal
             .borrow_mut()
@@ -141,6 +142,7 @@ impl Editor {
         }
 
         self.terminal.borrow_mut().cursor_show();
+        self.terminal.borrow_mut().end_synchronized_update();
         self.terminal.borrow_mut().flush()
     }
 
@@ -313,8 +315,7 @@ impl Editor {
             }
             Event::Resize(width, height) => {
                 self.terminal.borrow_mut().size.width = width;
-                self.terminal.borrow_mut().size.height =
-                    height - if env::consts::OS == "windows" { 1 } else { 2 };
+                self.terminal.borrow_mut().size.height = height - 2;
                 Ok(())
             }
             _ => Ok(()),
