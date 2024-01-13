@@ -315,8 +315,7 @@ impl Editor {
             }
             Event::Resize(width, height) => {
                 self.terminal.borrow_mut().size.width = width;
-                self.terminal.borrow_mut().size.height =
-                    height - if env::consts::OS == "windows" { 1 } else { 2 };
+                self.terminal.borrow_mut().size.height = height - 2;
                 Ok(())
             }
             _ => Ok(()),

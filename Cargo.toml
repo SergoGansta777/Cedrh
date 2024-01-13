@@ -1,6 +1,6 @@
 [package]
 name = "cedrh"
-version = "0.4.7"
+version = "0.5.0"
 edition = "2021"
 authors = ["Sergey Nechoroshev <sergo777ser777@gmail.com>"]
 description = """
