@@ -5,7 +5,10 @@ use crossterm::{
     event::{read, Event},
     queue,
     style::{Color, Print, ResetColor, SetBackgroundColor, SetForegroundColor},
-    terminal::{self, Clear, EnterAlternateScreen, LeaveAlternateScreen},
+    terminal::{
+        self, BeginSynchronizedUpdate, Clear, EndSynchronizedUpdate, EnterAlternateScreen,
+        LeaveAlternateScreen,
+    },
 };
 use std::io::{self, Error, Stdout, Write};
 
@@ -91,6 +94,14 @@ impl Terminal {
 
     pub fn disable_alternative_screen(&mut self) {
         queue!(self.stdout, LeaveAlternateScreen).ok();
+    }
+
+    pub fn begin_synchronized_update(&mut self) {
+        queue!(self.stdout, BeginSynchronizedUpdate).ok();
+    }
+
+    pub fn end_synchronized_update(&mut self) {
+        queue!(self.stdout, EndSynchronizedUpdate).ok();
     }
 
     pub fn write_row(&mut self, row: &str, new_line: bool) {
