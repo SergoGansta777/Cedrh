@@ -127,7 +127,7 @@ impl Editor {
                 Some(
                     self.offset
                         .y
-                        .saturating_add(self.terminal.borrow_mut().size().height as usize),
+                        .saturating_add(self.terminal.borrow().size().height as usize),
                 ),
             );
             self.draw_rows();
@@ -147,7 +147,7 @@ impl Editor {
     #[allow(clippy::as_conversions)]
     fn draw_status_bar(&self) {
         let mut status;
-        let width = self.terminal.borrow_mut().size().width as usize;
+        let width = self.terminal.borrow().size().width as usize;
         let modified_indicator = if self.buffer.is_modificated() {
             " (modified)"
         } else {
@@ -156,7 +156,7 @@ impl Editor {
         let mut file_name = "[No Name]".to_owned();
         if let Some(name) = self.buffer.file_name() {
             file_name = (*name).clone();
-            file_name.truncate(20);
+            file_name.truncate(35);
         }
 
         status = format!(
@@ -169,7 +169,7 @@ impl Editor {
             "{} | {}/{}",
             self.buffer.file_type(),
             self.cursor_position.y.saturating_add(1),
-            self.buffer.len()
+            self.buffer.len(),
         );
 
         #[allow(clippy::arithmetic_side_effects)]
@@ -187,20 +187,18 @@ impl Editor {
             .borrow_mut()
             .set_fg_color(self.colors["foreground"]);
 
-        self.terminal.borrow_mut().write_row(&status);
-        self.terminal.borrow_mut().add_new_line();
+        self.terminal.borrow_mut().write_row(&status, true);
         self.terminal.borrow_mut().reset_fg_color();
         self.terminal.borrow_mut().reset_bg_color();
     }
 
     #[allow(clippy::as_conversions)]
     fn draw_message_bar(&self) {
-        self.terminal.borrow_mut().clear_current_line();
         let message = &self.status_message;
         if message.time.elapsed() < Duration::new(45, 0) {
             let mut text = message.text.clone();
-            text.truncate(self.terminal.borrow_mut().size().width as usize);
-            self.terminal.borrow_mut().write_row(&text);
+            text.truncate(self.terminal.borrow().size().width as usize);
+            self.terminal.borrow_mut().write_row(&text, false);
         }
     }
 
@@ -224,11 +222,13 @@ impl Editor {
                                 .take(graphemes_count.saturating_sub(1))
                                 .collect();
                         }
-                        KeyCode::Enter => break,
                         KeyCode::Char(ch) => {
                             if !ch.is_control() {
                                 result.push(ch);
                             }
+                        }
+                        KeyCode::Enter => {
+                            break;
                         }
                         KeyCode::Esc => {
                             result.truncate(0);
@@ -244,6 +244,7 @@ impl Editor {
         if result.is_empty() {
             return Ok(None);
         }
+        self.refresh_screen()?;
         Ok(Some(result))
     }
 
@@ -382,8 +383,8 @@ impl Editor {
     #[allow(clippy::as_conversions)]
     fn scroll(&mut self) {
         let Position { x, y } = self.cursor_position;
-        let width = self.terminal.borrow_mut().size().width as usize;
-        let height = self.terminal.borrow_mut().size().height as usize;
+        let width = self.terminal.borrow().size().width as usize;
+        let height = self.terminal.borrow().size().height as usize;
         let offset = &mut self.offset;
 
         if y < offset.y {
@@ -400,7 +401,7 @@ impl Editor {
 
     #[allow(clippy::as_conversions, clippy::arithmetic_side_effects)]
     fn move_cursor(&mut self, key: KeyCode) {
-        let terminal_height = self.terminal.borrow_mut().size().height as usize;
+        let terminal_height = self.terminal.borrow().size().height as usize;
         let Position { mut y, mut x } = self.cursor_position;
         let height = self.buffer.len();
         let mut width = if let Some(row) = self.buffer.row(y) {
@@ -466,6 +467,8 @@ impl Editor {
         self.cursor_position = Position { x, y }
     }
 
+    /// Draws welcome message when user opens an empty buffer
+    /// This message is centered
     fn draw_welcome_message(&self) {
         let info_message = format!("{EDITOR_NAME} editor --version {VERSION}");
         let welcome_messages = [info_message.as_str(), "Welcome to the club!"];
@@ -476,7 +479,7 @@ impl Editor {
 
     #[allow(clippy::as_conversions)]
     fn draw_centered_message(&self, message: &str) {
-        let width = self.terminal.borrow_mut().size().width as usize;
+        let width = self.terminal.borrow().size().width as usize;
         let len = message.len();
 
         #[allow(clippy::arithmetic_side_effects, clippy::integer_division)]
@@ -486,18 +489,18 @@ impl Editor {
         let welcome_message = format!("~{spaces}{message}");
         let truncated_message = welcome_message.chars().take(width).collect::<String>();
 
-        self.terminal.borrow_mut().write_row(&truncated_message);
-        self.terminal.borrow_mut().add_new_line();
+        self.terminal
+            .borrow_mut()
+            .write_row(&truncated_message, true);
     }
 
     #[allow(clippy::as_conversions)]
     pub fn draw_row(&self, row: &Row) {
-        let width = self.terminal.borrow_mut().size().width as usize;
+        let width = self.terminal.borrow().size().width as usize;
         let start = self.offset.x;
         let end = self.offset.x.saturating_add(width);
         let row = row.render(&self.colors, start, end);
-        self.terminal.borrow_mut().write_row(&row);
-        self.terminal.borrow_mut().add_new_line();
+        self.terminal.borrow_mut().write_row(&row, true);
     }
 
     #[allow(
@@ -506,10 +509,8 @@ impl Editor {
         clippy::as_conversions
     )]
     fn draw_rows(&self) {
-        let height = self.terminal.borrow_mut().size().height;
+        let height = self.terminal.borrow().size().height;
         for terminal_row in 0..height {
-            self.terminal.borrow_mut().clear_current_line();
-
             match self
                 .buffer
                 .row(self.offset.y.saturating_add(terminal_row as usize))
@@ -519,8 +520,7 @@ impl Editor {
                     self.draw_welcome_message();
                 }
                 None => {
-                    self.terminal.borrow_mut().write_row("~");
-                    self.terminal.borrow_mut().add_new_line();
+                    self.terminal.borrow_mut().write_row("~", true);
                 }
             }
         }

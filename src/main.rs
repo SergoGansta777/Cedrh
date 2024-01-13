@@ -38,7 +38,15 @@ mod highlighting;
 mod row;
 mod terminal;
 
+#[cfg(target_os = "windows")]
+fn enable_virtual_terminal_processing() -> Result<(), Error> {
+    use crossterm::terminal::enable_ansi_support;
+    enable_ansi_support()
+}
+
 fn main() {
+    #[cfg(target_os = "windows")]
+    enable_virtual_terminal_processing().ok();
     let args = AppArgs::parse();
     Editor::new(&args).run();
 }

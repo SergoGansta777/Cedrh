@@ -3,9 +3,9 @@ use crate::Position;
 use crossterm::{
     cursor,
     event::{read, Event},
-    style::{Color, ResetColor, SetBackgroundColor, SetForegroundColor},
-    terminal::{self, EnterAlternateScreen, LeaveAlternateScreen},
-    QueueableCommand,
+    queue,
+    style::{Color, Print, ResetColor, SetBackgroundColor, SetForegroundColor},
+    terminal::{self, Clear, EnterAlternateScreen, LeaveAlternateScreen},
 };
 use std::io::{self, Error, Stdout, Write};
 
@@ -41,16 +41,15 @@ impl Terminal {
     }
 
     pub fn clear_screen(&mut self) {
-        self.stdout
-            .queue(terminal::Clear(terminal::ClearType::All))
-            .ok();
+        queue!(self.stdout, Clear(terminal::ClearType::All)).ok();
     }
 
     pub fn quit(&mut self) {
         self.reset_colors();
         self.clear_screen();
-        println!("Goodbye!\r");
         terminal::disable_raw_mode().ok();
+
+        self.flush().ok();
     }
 
     #[allow(clippy::cast_possible_truncation, clippy::as_conversions)]
@@ -61,9 +60,13 @@ impl Terminal {
         let x = x as u16;
         let y = y as u16;
 
-        self.stdout
-            .queue(cursor::MoveTo(x.saturating_sub(1), y.saturating_sub(1)))
-            .ok();
+        queue!(
+            self.stdout,
+            cursor::MoveTo(x.saturating_sub(1), y.saturating_sub(1))
+        )
+        .ok();
+
+        self.stdout.flush().ok();
     }
 
     pub fn flush(&mut self) -> Result<(), Error> {
@@ -75,53 +78,51 @@ impl Terminal {
     }
 
     pub fn cursor_hide(&mut self) {
-        self.stdout.queue(cursor::Hide).ok();
+        queue!(self.stdout, cursor::Hide).ok();
     }
 
     pub fn cursor_show(&mut self) {
-        self.stdout.queue(cursor::Show).ok();
+        queue!(self.stdout, cursor::Show).ok();
     }
 
     pub fn enable_alternative_screen(&mut self) {
-        self.stdout.queue(EnterAlternateScreen).ok();
+        queue!(self.stdout, EnterAlternateScreen).ok();
     }
 
     pub fn disable_alternative_screen(&mut self) {
-        self.stdout.queue(LeaveAlternateScreen).ok();
+        queue!(self.stdout, LeaveAlternateScreen).ok();
     }
 
-    pub fn write_row(&mut self, row: &str) {
-        self.stdout.queue(crossterm::style::Print(row)).ok();
-        self.stdout.queue(crossterm::style::Print("\r")).ok();
-    }
-
-    pub fn add_new_line(&mut self) {
-        self.stdout.queue(crossterm::style::Print("\n")).ok();
-    }
-
-    pub fn clear_current_line(&mut self) {
-        self.stdout
-            .queue(terminal::Clear(terminal::ClearType::CurrentLine))
-            .ok();
+    pub fn write_row(&mut self, row: &str, new_line: bool) {
+        queue!(
+            self.stdout,
+            Print(row),
+            Clear(terminal::ClearType::UntilNewLine),
+            Print("\r"),
+        )
+        .ok();
+        if new_line {
+            queue!(self.stdout, Print("\n")).ok();
+        }
     }
 
     pub fn reset_colors(&mut self) {
-        self.stdout.queue(ResetColor).ok();
+        queue!(self.stdout, ResetColor).ok();
     }
 
     pub fn set_bg_color(&mut self, color: Color) {
-        self.stdout.queue(SetBackgroundColor(color)).ok();
+        queue!(self.stdout, SetBackgroundColor(color)).ok();
     }
 
     pub fn reset_bg_color(&mut self) {
-        self.stdout.queue(SetBackgroundColor(Color::Reset)).ok();
+        queue!(self.stdout, SetBackgroundColor(Color::Reset)).ok();
     }
 
     pub fn set_fg_color(&mut self, color: Color) {
-        self.stdout.queue(SetForegroundColor(color)).ok();
+        queue!(self.stdout, SetForegroundColor(color)).ok();
     }
 
     pub fn reset_fg_color(&mut self) {
-        self.stdout.queue(SetForegroundColor(Color::Reset)).ok();
+        queue!(self.stdout, SetForegroundColor(Color::Reset)).ok();
     }
 }

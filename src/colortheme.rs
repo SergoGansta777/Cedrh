@@ -6,9 +6,9 @@ use std::path::PathBuf;
 
 use crossterm::style::Color;
 
-const CUSTOM_CONFIG_PATH: &str = "/path/to/custom-config";
-const KITTY_THEME_PATH: &str = "/home/user/.config/kitty/current-theme.conf";
-const KITTY_CONF_PATH: &str = "/home/user/.config/kitty/kitty.conf";
+const CUSTOM_CONFIG_PATH: &str = "~/.config/cedrh/cedrh.conf";
+const KITTY_THEME_PATH: &str = "~/.config/kitty/current-theme.conf";
+const KITTY_CONF_PATH: &str = "~/.config/kitty/kitty.conf";
 
 pub fn get_colors(term: &str, use_default: bool) -> HashMap<String, Color> {
     if use_default {
@@ -16,7 +16,11 @@ pub fn get_colors(term: &str, use_default: bool) -> HashMap<String, Color> {
     }
 
     if let Ok(custom_config) = parse_simple_config(CUSTOM_CONFIG_PATH) {
-        custom_config
+        if custom_config.is_empty() {
+            get_default_colors()
+        } else {
+            custom_config
+        }
     } else {
         match term {
             "xterm-kitty" | "ansi" => parse_simple_config(KITTY_THEME_PATH)
