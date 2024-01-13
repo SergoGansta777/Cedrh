@@ -16,7 +16,11 @@ pub fn get_colors(term: &str, use_default: bool) -> HashMap<String, Color> {
     }
 
     if let Ok(custom_config) = parse_simple_config(CUSTOM_CONFIG_PATH) {
-        custom_config
+        if custom_config.is_empty() {
+            get_default_colors()
+        } else {
+            custom_config
+        }
     } else {
         match term {
             "xterm-kitty" | "ansi" => parse_simple_config(KITTY_THEME_PATH)
