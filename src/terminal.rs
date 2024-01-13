@@ -65,6 +65,8 @@ impl Terminal {
             cursor::MoveTo(x.saturating_sub(1), y.saturating_sub(1))
         )
         .ok();
+
+        self.stdout.flush().ok();
     }
 
     pub fn flush(&mut self) -> Result<(), Error> {
